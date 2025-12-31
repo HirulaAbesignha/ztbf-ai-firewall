@@ -108,3 +108,25 @@ Pivots to adjacent microservices → Establishes persistence
 **Impact:** CRITICAL - Full environment compromise, persistent access
 
 ---
+
+#### Scenario 2.2: Privilege Escalation via Cloud APIs
+**Attack Flow:**
+```
+Attacker gains low-privilege access → Enumerates IAM policies → 
+Exploits misconfigured role → Assumes admin privileges → 
+Modifies security groups, creates backdoor accounts
+```
+
+**Traditional Firewall Blindspot:**
+- Cloud API calls are legitimate HTTPS traffic
+- IAM operations appear as normal administrative activity
+
+**ZTBF Detection Signals:**
+- IAM enumeration pattern (listing roles, policies, permissions)
+- Privilege modification attempts (updating assume-role policies)
+- New credential creation (API key generation spike)
+- Security policy changes (firewall rule modifications)
+
+**Impact:** CRITICAL - Admin-level compromise, environment takeover
+
+---
