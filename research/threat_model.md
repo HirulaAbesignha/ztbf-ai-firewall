@@ -63,3 +63,24 @@ Accesses resources normally restricted → Downloads sensitive data
 **Impact:** HIGH - Direct data breach, compliance violation
 
 ---
+
+#### Scenario 1.2: Token/Session Hijacking
+**Attack Flow:**
+```
+Attacker steals API token/JWT → Uses token to access APIs → 
+Enumerates resources → Exfiltrates data via legitimate API calls
+```
+
+**Traditional Firewall Blindspot:**
+- API traffic appears legitimate (valid token, proper TLS)
+- Rate limits may not trigger for low-and-slow attacks
+
+**ZTBF Detection Signals:**
+- API call sequence anomaly (unusual endpoint combinations)
+- Velocity anomaly (10x normal API call rate)
+- Resource enumeration pattern (sequential ID scanning)
+- Data volume anomaly (downloading entire customer table)
+
+**Impact:** HIGH - API abuse, mass data exfiltration
+
+---
