@@ -37,3 +37,29 @@ This threat model defines the adversarial landscape that ZTBF is designed to def
 | **Advanced Persistent Threat (APT)** | State-sponsored, patient, sophisticated | Long-term espionage | Multiple compromised accounts |
 
 ---
+
+## Threat Scenarios
+
+### 1. CREDENTIAL THEFT & MISUSE (Priority 1)
+
+#### Scenario 1.1: Stolen Password Reuse
+**Attack Flow:**
+```
+Attacker obtains credentials → Logs in from new location → 
+Accesses resources normally restricted → Downloads sensitive data
+```
+
+**Traditional Firewall Blindspot:**
+- Valid credentials = Valid traffic
+- Network-level firewalls see authorized IP/port combinations
+- No visibility into authentication context or access patterns
+
+**ZTBF Detection Signals:**
+- Geographic impossibility (login from US, then China 10 minutes later)
+- Device fingerprint mismatch
+- Time-of-day anomaly (access at 3 AM, user normally 9-5)
+- Resource access deviation (accessing financial DB, never done before)
+
+**Impact:** HIGH - Direct data breach, compliance violation
+
+---
