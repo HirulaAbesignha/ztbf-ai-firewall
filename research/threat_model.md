@@ -84,3 +84,27 @@ Enumerates resources → Exfiltrates data via legitimate API calls
 **Impact:** HIGH - API abuse, mass data exfiltration
 
 ---
+
+### 2. LATERAL MOVEMENT (Priority 2)
+
+#### Scenario 2.1: East-West Service Exploitation
+**Attack Flow:**
+```
+Attacker compromises web server → Uses service account to access database → 
+Pivots to adjacent microservices → Establishes persistence
+```
+
+**Traditional Firewall Blindspot:**
+- Internal network traffic often less scrutinized
+- Service-to-service calls expected and allowed
+- No behavior baseline for service accounts
+
+**ZTBF Detection Signals:**
+- Service dependency graph violation (service A never calls service D)
+- Unusual database query patterns (admin queries from app service)
+- Time-based anomaly (batch service active during business hours)
+- Cross-zone access (frontend service accessing backend admin API)
+
+**Impact:** CRITICAL - Full environment compromise, persistent access
+
+---
