@@ -25,3 +25,15 @@ This threat model defines the adversarial landscape that ZTBF is designed to def
 - Malware analysis
 - DDoS attacks
 - Zero-day exploits in applications
+
+### Attacker Profiles
+
+| Profile | Capability | Motivation | Access Level |
+|---------|-----------|------------|--------------|
+| **External Attacker (Post-Compromise)** | High technical skill, stolen credentials | Financial gain, espionage | Valid user credentials |
+| **Malicious Insider** | Intimate system knowledge, legitimate access | Revenge, financial gain, ideology | Authorized user account |
+| **Compromised Service Account** | Automated access, API tokens | Pivot point for lateral movement | Service-level privileges |
+| **Negligent Insider** | Low security awareness | Unintentional harm | Standard user access |
+| **Advanced Persistent Threat (APT)** | State-sponsored, patient, sophisticated | Long-term espionage | Multiple compromised accounts |
+
+---
