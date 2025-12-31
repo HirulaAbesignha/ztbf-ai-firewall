@@ -18,3 +18,10 @@ This threat model defines the adversarial landscape that ZTBF is designed to def
 - Internal APIs and microservices
 - Sensitive data repositories
 - Administrative interfaces
+
+### Out-of-Scope (Phase 0)
+- Physical security
+- Social engineering detection
+- Malware analysis
+- DDoS attacks
+- Zero-day exploits in applications
