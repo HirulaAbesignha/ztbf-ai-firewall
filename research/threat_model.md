@@ -176,3 +176,24 @@ Uploads to personal cloud storage → Sells data on dark web
 **Impact:** HIGH - Data breach, regulatory fines, reputational damage
 
 ---
+
+#### Scenario 4.2: Insider Reconnaissance
+**Attack Flow:**
+```
+Employee explores unauthorized areas → Tests access boundaries → 
+Maps network architecture → Prepares for attack or sells intelligence
+```
+
+**Traditional Firewall Blindspot:**
+- Exploration appears as normal browsing/navigation
+- No malicious payload detected
+
+**ZTBF Detection Signals:**
+- Access pattern deviation (visiting admin panels, unusual apps)
+- Failed authorization attempts (trying restricted resources)
+- Documentation access (reading security policies, architecture docs)
+- Screenshot/documentation tools usage
+
+**Impact:** MEDIUM - Preparation for larger attack, information gathering
+
+---
