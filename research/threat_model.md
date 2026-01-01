@@ -277,3 +277,28 @@ Uses DNS tunneling or steganography → Evades traditional detection
 
 ---
 
+## Trust Assumptions
+
+### What We Trust (Initially)
+- Identity provider authentication (assume MFA enforced)
+- Logging infrastructure integrity (CloudTrail, Azure AD logs)
+- Time synchronization (NTP-based timestamps accurate)
+- Initial baseline period data quality
+
+### What We Never Trust
+- That valid credentials = legitimate user
+- That authorized access = appropriate action
+- That internal traffic = safe traffic
+- That past behavior guarantees future intent
+- That a single signal determines risk
+
+### Progressive Trust Model
+```
+New Entity → Low Trust (restrictive, high scrutiny)
+    ↓ (30 days baseline)
+Established Pattern → Medium Trust (normal access, moderate monitoring)
+    ↓ (continued good behavior)
+Trusted Entity → High Trust (streamlined access, anomaly-focused monitoring)
+    ↓ (any suspicious behavior)
+Re-evaluation → Trust reduced, enhanced monitoring
+```
