@@ -130,3 +130,26 @@ Modifies security groups, creates backdoor accounts
 **Impact:** CRITICAL - Admin-level compromise, environment takeover
 
 ---
+
+### 3. PRIVILEGE ESCALATION (Priority 3)
+
+#### Scenario 3.1: Abuse of Legitimate Admin Access
+**Attack Flow:**
+```
+Compromised admin account → Accesses production systems → 
+Disables logging → Modifies security controls → Creates backdoor
+```
+
+**Traditional Firewall Blindspot:**
+- Admin traffic is expected to have broad access
+- Privileged actions are technically authorized
+
+**ZTBF Detection Signals:**
+- Admin action velocity anomaly (100 changes in 10 minutes)
+- Logging/monitoring tampering (CloudTrail disabled)
+- Off-hours privileged access (admin login at 2 AM)
+- Bulk privilege grants (adding admin rights to 50 accounts)
+
+**Impact:** CRITICAL - Security control bypass, persistent backdoor
+
+---
