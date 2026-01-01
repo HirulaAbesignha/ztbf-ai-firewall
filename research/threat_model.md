@@ -153,3 +153,26 @@ Disables logging → Modifies security controls → Creates backdoor
 **Impact:** CRITICAL - Security control bypass, persistent backdoor
 
 ---
+
+### 4. INSIDER THREATS (Priority 4)
+
+#### Scenario 4.1: Malicious Data Exfiltration
+**Attack Flow:**
+```
+Disgruntled employee → Downloads customer database → 
+Uploads to personal cloud storage → Sells data on dark web
+```
+
+**Traditional Firewall Blindspot:**
+- Employee has legitimate access to the data
+- HTTPS upload to cloud storage is normal encrypted traffic
+
+**ZTBF Detection Signals:**
+- Data access volume spike (querying 100K records vs. normal 50)
+- Unusual data export (downloading full tables, not typical workflow)
+- Upload to external service (Dropbox, personal email)
+- Pre-termination behavior pattern (access spike before last day)
+
+**Impact:** HIGH - Data breach, regulatory fines, reputational damage
+
+---
