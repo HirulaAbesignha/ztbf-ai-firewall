@@ -220,3 +220,35 @@ Uses DNS tunneling or steganography → Evades traditional detection
 **Impact:** MEDIUM-HIGH - Slow but successful data theft
 
 ---
+
+## Why Traditional Firewalls Fail
+
+### Network Firewalls (L3/L4)
+**Limitation:** Only see IP addresses, ports, protocols
+- ❌ No identity awareness
+- ❌ No behavior context
+- ❌ No understanding of application logic
+- ❌ Allow all traffic from authenticated users
+
+### Web Application Firewalls (L7)
+**Limitation:** Focus on malicious payloads, not behavior
+- ❌ Miss legitimate credential misuse
+- ❌ No cross-session analysis
+- ❌ No user behavior baselining
+- ❌ Signature-based, not anomaly-based
+
+### Next-Gen Firewalls (NGFW)
+**Limitation:** Still network-centric
+- ❌ Limited cloud API visibility
+- ❌ No service-to-service behavior modeling
+- ❌ No identity-centric policies
+- ❌ Reactive rules, not predictive analytics
+
+### Identity-Aware Proxies
+**Limitation:** Static policy enforcement
+- ✅ Identity verification (good)
+- ❌ No dynamic behavior analysis
+- ❌ No risk scoring
+- ❌ No temporal/contextual awareness
+
+---
