@@ -252,3 +252,28 @@ Uses DNS tunneling or steganography → Evades traditional detection
 - ❌ No temporal/contextual awareness
 
 ---
+
+## ZTBF Value Proposition
+
+### What ZTBF Detects That Others Miss
+
+| Attack Type | Traditional Security | ZTBF Advantage |
+|-------------|---------------------|----------------|
+| Valid credential misuse | ❌ Allowed | ✅ Behavioral anomaly detected |
+| Insider data theft | ❌ Authorized access | ✅ Volume/pattern anomaly |
+| Lateral movement | ❌ Internal traffic allowed | ✅ Service graph violation |
+| Privilege escalation | ❌ Admin traffic permitted | ✅ Action velocity anomaly |
+| API abuse | ❌ Valid token accepted | ✅ Sequence/velocity anomaly |
+| Low-and-slow exfiltration | ❌ Under threshold | ✅ Time-series pattern detected |
+
+### Core Detection Principles
+
+1. **Identity-Centric**: Every action tied to a user/service identity
+2. **Behavior-Based**: Detect deviations from learned normal patterns
+3. **Context-Aware**: Consider time, location, device, resource sensitivity
+4. **Graph-Aware**: Understand entity relationships and dependencies
+5. **Temporal**: Analyze sequences and time-series patterns
+6. **Adaptive**: Models evolve as legitimate behavior changes
+
+---
+
