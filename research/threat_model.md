@@ -197,3 +197,26 @@ Maps network architecture → Prepares for attack or sells intelligence
 **Impact:** MEDIUM - Preparation for larger attack, information gathering
 
 ---
+
+### 5. DATA EXFILTRATION (Priority 5)
+
+#### Scenario 5.1: Low-and-Slow Data Theft
+**Attack Flow:**
+```
+Attacker exfiltrates small amounts daily → Stays under DLP thresholds → 
+Uses DNS tunneling or steganography → Evades traditional detection
+```
+
+**Traditional Firewall Blindspot:**
+- Small data transfers don't trigger volume alerts
+- Encrypted traffic hides payload content
+
+**ZTBF Detection Signals:**
+- Consistent small-volume anomaly (daily 100 MB download, never before)
+- Unusual protocol usage (DNS query volume spike)
+- Time-series pattern (exfiltration every night at 11 PM)
+- Destination anomaly (connections to rare/new external IPs)
+
+**Impact:** MEDIUM-HIGH - Slow but successful data theft
+
+---
