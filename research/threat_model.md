@@ -302,3 +302,42 @@ Trusted Entity → High Trust (streamlined access, anomaly-focused monitoring)
     ↓ (any suspicious behavior)
 Re-evaluation → Trust reduced, enhanced monitoring
 ```
+
+---
+
+## Attack Tree: Credential Theft Example
+
+```
+Goal: Exfiltrate Customer Database
+│
+├── [AND] Obtain Valid Credentials
+│   ├── [OR] Phishing
+│   ├── [OR] Password Reuse from Breach
+│   ├── [OR] Token Theft (XSS, malware)
+│   └── [OR] Insider access
+│
+├── [AND] Access Database
+│   ├── [OR] Direct DB connection
+│   ├── [OR] Via API gateway
+│   └── [OR] Via admin panel
+│
+├── [AND] Evade Detection
+│   ├── [OR] Mimic normal query patterns
+│   ├── [OR] Use off-peak hours
+│   └── [OR] Low-volume exfiltration
+│
+└── [AND] Exfiltrate Data
+    ├── [OR] Download to local machine
+    ├── [OR] Upload to external service
+    └── [OR] DNS tunneling
+
+ZTBF Detection Points:
+- Login from unusual location
+- Device fingerprint mismatch
+- Database access volume anomaly
+- Query pattern deviation
+- Off-hours access spike
+- External data transfer
+```
+
+---
