@@ -341,3 +341,27 @@ ZTBF Detection Points:
 ```
 
 ---
+
+## Threat Model Summary
+
+### High-Priority Threats
+1. ✅ Credential theft and misuse
+2. ✅ Lateral movement via service accounts
+3. ✅ Privilege escalation via cloud APIs
+4. ✅ Malicious insider data exfiltration
+5. ✅ Low-and-slow data theft
+
+### Detection Strategy
+- **Unsupervised ML**: Detect unknown attack patterns
+- **Supervised ML**: Classify known threat behaviors
+- **Graph Analysis**: Detect lateral movement
+- **Time-Series**: Identify temporal anomalies
+- **Ensemble**: Combine multiple signals for high confidence
+
+### Risk Mitigation
+- **False Positives**: Explainable AI, analyst feedback loop
+- **Concept Drift**: Continuous model retraining
+- **Evasion**: Multi-model ensemble, adversarial testing
+- **Cold Start**: Conservative defaults, role-based baselines
+
+---
