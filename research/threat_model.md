@@ -365,3 +365,13 @@ ZTBF Detection Points:
 - **Cold Start**: Conservative defaults, role-based baselines
 
 ---
+
+## References
+
+- MITRE ATT&CK Framework: Credential Access, Lateral Movement, Exfiltration
+- NIST Zero Trust Architecture (SP 800-207)
+- OWASP API Security Top 10
+- Cloud Security Alliance: Zero Trust Advancement Center
+- Google BeyondCorp: A New Approach to Enterprise Security
+
+---
