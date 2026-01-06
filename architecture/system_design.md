@@ -162,3 +162,55 @@
 ```
 
 ---
+
+## Component Details
+
+### 1. DATA INGESTION LAYER
+
+**Purpose**: Reliably collect events from multiple sources
+
+**Technologies (MVP)**:
+- **Message Queue**: Apache Kafka (Redpanda for lightweight local dev)
+- **Log Shippers**: Filebeat, Fluentd, custom collectors
+- **API Gateway**: FastAPI endpoints for push-based ingestion
+
+**Key Features**:
+- Schema validation (Avro/JSON Schema)
+- Buffering for burst traffic
+- Backpressure handling
+- Dead letter queue for malformed events
+
+**Data Sources**:
+```yaml
+# Source 1: Azure AD Sign-in Logs
+Format: JSON
+Schema: Microsoft Graph API format
+Fields: userId, timestamp, ipAddress, location, deviceId, riskLevel
+
+# Source 2: AWS CloudTrail
+Format: JSON (Gzipped)
+Schema: AWS CloudTrail Event format
+Fields: userIdentity, eventTime, sourceIPAddress, userAgent, eventName
+
+# Source 3: Kubernetes Audit Logs
+Format: JSON
+Schema: K8s Audit Event format
+Fields: user, verb, objectRef, sourceIPs, userAgent, timestamp
+
+# Source 4: VPC Flow Logs
+Format: Space-delimited text → parsed to JSON
+Schema: AWS VPC Flow format
+Fields: srcaddr, dstaddr, srcport, dstport, protocol, bytes, packets
+
+# Source 5: API Gateway Logs
+Format: JSON
+Schema: Custom application format
+Fields: userId, endpoint, method, statusCode, latency, timestamp
+```
+
+**MVP Implementation**:
+- File-based ingestion (replay log files into Kafka)
+- Synthetic log generator for testing
+- Local Kafka instance (Redpanda in Docker)
+
+---
