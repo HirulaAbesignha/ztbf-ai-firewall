@@ -444,3 +444,23 @@ def make_decision(risk_score, confidence):
     else:
         return "ALERT", "Low confidence, human review needed"
 ```
+
+**Policy Engine**:
+```yaml
+# Example policy rules
+policies:
+  - id: POLICY_001
+    name: "Block high-risk admin actions"
+    condition: "risk_score > 75 AND user.role == 'ADMIN'"
+    action: "BLOCK"
+  
+  - id: POLICY_002
+    name: "Challenge unusual geographic access"
+    condition: "impossible_travel == true"
+    action: "CHALLENGE_MFA"
+  
+  - id: POLICY_003
+    name: "Alert on sensitive data access spike"
+    condition: "resource.type == 'CUSTOMER_DB' AND access_volume > baseline * 5"
+    action: "ALERT"
+```
