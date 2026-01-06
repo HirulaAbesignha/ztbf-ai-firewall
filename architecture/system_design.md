@@ -29,7 +29,7 @@
 
 ## High-Level System Architecture
 
-![High-Level System Architecture](diagrams/SystemArchitecture.png)
+<img src="diagrams/SystemArchitecture.png" alt="High-Level System Architecture">
 
 ---
 
