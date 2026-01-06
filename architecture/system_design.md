@@ -365,3 +365,13 @@ Output: Link prediction score, community anomaly score
 Training: Semi-supervised on normal access patterns
 Use Case: Insider threats, service account compromise
 ```
+
+#### Model 4: Transformer (Contextual Attention)
+```yaml
+Purpose: Understand context and intent from event sequences
+Algorithm: Transformer encoder (attention-based)
+Input: Event metadata sequence with temporal attention
+Output: Contextual risk score
+Training: Self-supervised (masked event prediction)
+Use Case: Context-aware risk scoring, intent classification
+```
