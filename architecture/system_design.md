@@ -425,3 +425,22 @@ def calculate_risk_score(event, model_predictions, context):
     
     return normalize_score(final_risk)  # 0-100 scale
 ```
+
+**Decision Logic**:
+```python
+def make_decision(risk_score, confidence):
+    if risk_score < 30:
+        return "ALLOW", "Log event for audit"
+    
+    elif 30 <= risk_score < 60:
+        return "ALERT", "Notify SOC analyst"
+    
+    elif 60 <= risk_score < 80 and confidence > 0.7:
+        return "CHALLENGE", "Require step-up MFA"
+    
+    elif risk_score >= 80 and confidence > 0.8:
+        return "BLOCK", "Deny action and alert"
+    
+    else:
+        return "ALERT", "Low confidence, human review needed"
+```
