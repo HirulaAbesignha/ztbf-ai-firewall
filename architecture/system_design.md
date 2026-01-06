@@ -278,3 +278,12 @@ def process_event_stream(raw_event):
 - failed_auth_count_last_10m
 - unique_ips_last_24h
 - unique_devices_last_7d
+```
+
+#### B. Sequence Features
+```python
+# Example sequence features
+- last_10_actions = ["login", "read_db", "write_s3", ...]
+- action_pair_frequency = {("login", "read_db"): 0.95, ...}
+- rare_action_sequences = detect_rare_ngrams(action_sequence)
+```
