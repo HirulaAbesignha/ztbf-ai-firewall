@@ -328,3 +328,20 @@ def process_event_stream(raw_event):
 - Redis for feature caching
 
 ---
+
+### 4. AI MODEL ENSEMBLE
+
+**Purpose**: Detect anomalies using multiple ML approaches
+
+#### Model 1: Isolation Forest (Anomaly Detection)
+```yaml
+Purpose: Detect statistical outliers in feature space
+Algorithm: Isolation Forest (sklearn)
+Input Features:
+  - Velocity features (login rate, API call rate)
+  - Contextual features (geo distance, time deviation)
+  - Resource access patterns
+Output: Anomaly score (0.0 = normal, 1.0 = highly anomalous)
+Training: Unsupervised on 30 days of baseline data
+Retraining: Weekly incremental updates
+```
