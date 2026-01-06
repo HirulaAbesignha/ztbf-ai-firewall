@@ -397,3 +397,31 @@ confidence = calculate_model_agreement(all_scores)
 - Add Transformer (Phase 3)
 
 ---
+
+### 5. RISK SCORING & DECISION ENGINE
+
+**Purpose**: Convert ML predictions into actionable risk scores
+
+**Risk Score Calculation**:
+```python
+def calculate_risk_score(event, model_predictions, context):
+    # Base risk from ensemble
+    base_risk = weighted_ensemble(model_predictions)
+    
+    # Adjust for business context
+    if context.resource_sensitivity == "CRITICAL":
+        base_risk *= 1.5
+    
+    if context.user_role == "ADMIN":
+        base_risk *= 1.3
+    
+    # Adjust for historical behavior
+    user_history = get_user_history(context.user_id)
+    if user_history.false_positive_rate > 0.2:
+        base_risk *= 0.8  # Trust user more if many false positives
+    
+    # Adjust for confidence
+    final_risk = base_risk * model_predictions.confidence
+    
+    return normalize_score(final_risk)  # 0-100 scale
+```
