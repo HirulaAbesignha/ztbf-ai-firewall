@@ -345,3 +345,13 @@ Output: Anomaly score (0.0 = normal, 1.0 = highly anomalous)
 Training: Unsupervised on 30 days of baseline data
 Retraining: Weekly incremental updates
 ```
+
+#### Model 2: LSTM Autoencoder (Sequence Anomaly)
+```yaml
+Purpose: Detect unusual action sequences
+Algorithm: LSTM Autoencoder (TensorFlow/PyTorch)
+Input: Sequence of user actions (last 50 actions)
+Output: Reconstruction error (high = anomalous sequence)
+Training: Unsupervised on normal user action sequences
+Use Case: Detect lateral movement, privilege escalation patterns
+```
