@@ -307,3 +307,24 @@ def process_event_stream(raw_event):
 - time_since_last_login = seconds
 - access_time_deviation = abs(current_hour - user_avg_hour)
 ```
+
+#### E. Contextual Features
+```python
+# Example contextual features
+- geographic_distance_km = haversine(last_ip, current_ip)
+- impossible_travel = bool  # login US then China 5 mins later
+- device_change = bool      # different device than usual
+- new_ip_for_user = bool    # IP never seen before for this user
+- resource_sensitivity = int  # 1=low, 5=critical (based on data classification)
+```
+
+**Feature Store**:
+- **Historical**: Parquet files in S3/MinIO (for training)
+- **Online**: Redis (for real-time inference)
+
+**MVP Implementation**:
+- Python-based feature engineering
+- Pandas/Polars for batch processing
+- Redis for feature caching
+
+---
