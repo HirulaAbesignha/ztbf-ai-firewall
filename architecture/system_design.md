@@ -262,3 +262,19 @@ def process_event_stream(raw_event):
 - Threat intelligence feeds (optional)
 
 ---
+
+### 3. FEATURE ENGINEERING
+
+**Purpose**: Transform raw events into ML-ready features
+
+**Feature Categories**:
+
+#### A. Velocity Features
+```python
+# Example velocity features
+- login_count_last_1h
+- login_count_last_24h
+- api_call_rate_per_minute
+- failed_auth_count_last_10m
+- unique_ips_last_24h
+- unique_devices_last_7d
