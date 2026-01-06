@@ -296,3 +296,14 @@ def process_event_stream(raw_event):
 - network_community_id = int           # which cluster user belongs to
 - centrality_score = float             # how central user is in access graph
 ```
+
+#### D. Temporal Features
+```python
+# Example temporal features
+- hour_of_day = 0-23
+- day_of_week = 0-6
+- is_weekend = bool
+- is_business_hours = bool
+- time_since_last_login = seconds
+- access_time_deviation = abs(current_hour - user_avg_hour)
+```
