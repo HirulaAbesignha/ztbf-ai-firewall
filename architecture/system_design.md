@@ -464,3 +464,50 @@ policies:
     condition: "resource.type == 'CUSTOMER_DB' AND access_volume > baseline * 5"
     action: "ALERT"
 ```
+
+---
+
+### 6. EXPLAINABILITY MODULE
+
+**Purpose**: Provide human-understandable reasons for decisions
+
+**Techniques**:
+- **SHAP (SHapley Additive exPlanations)**: Feature importance
+- **LIME (Local Interpretable Model-agnostic Explanations)**: Local explanations
+- **Attention Weights**: For transformer models
+- **Rule Extraction**: Convert decisions to if-then rules
+
+**Example Output**:
+```json
+{
+  "risk_score": 85,
+  "decision": "BLOCK",
+  "confidence": 0.92,
+  "explanation": {
+    "primary_reason": "Impossible travel detected",
+    "contributing_factors": [
+      {
+        "feature": "geographic_distance_km",
+        "value": 8547,
+        "contribution": 0.35,
+        "description": "Login from Tokyo 10 minutes after login from New York"
+      },
+      {
+        "feature": "access_volume_ratio",
+        "value": 12.3,
+        "contribution": 0.28,
+        "description": "Accessing 12x more data than usual"
+      },
+      {
+        "feature": "unusual_hour",
+        "value": 3,
+        "contribution": 0.15,
+        "description": "Access at 3 AM, user typically active 9 AM - 5 PM"
+      }
+    ],
+    "recommendation": "Verify user identity via alternate channel before allowing access"
+  }
+}
+```
+
+---
