@@ -214,3 +214,51 @@ Fields: userId, endpoint, method, statusCode, latency, timestamp
 - Local Kafka instance (Redpanda in Docker)
 
 ---
+
+### 2. STREAM PROCESSING
+
+**Purpose**: Normalize, enrich, and prepare events for analysis
+
+**Technologies**:
+- **Primary**: Apache Spark Structured Streaming
+- **Alternative**: Apache Flink (for lower latency)
+- **MVP**: Python-based streaming (can upgrade later)
+
+**Processing Steps**:
+
+```python
+# Pseudocode: Stream Processing Pipeline
+
+def process_event_stream(raw_event):
+    # Step 1: Normalize schema
+    normalized = normalize_schema(raw_event)
+    
+    # Step 2: Enrich with context
+    enriched = enrich_event(normalized)
+    #   - GeoIP lookup (IP → Country/City)
+    #   - Device fingerprint lookup
+    #   - User/service metadata
+    
+    # Step 3: Deduplicate
+    if is_duplicate(enriched):
+        return None
+    
+    # Step 4: Extract entity identifiers
+    entity_id = extract_entity_id(enriched)
+    
+    # Step 5: Persist to storage
+    write_to_storage(enriched)
+    
+    # Step 6: Forward to feature engineering
+    emit_to_feature_pipeline(enriched)
+    
+    return enriched
+```
+
+**Enrichment Sources**:
+- GeoIP database (MaxMind GeoLite2 - free)
+- Device fingerprint database (custom)
+- User metadata (from identity provider)
+- Threat intelligence feeds (optional)
+
+---
