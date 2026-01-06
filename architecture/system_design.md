@@ -355,3 +355,13 @@ Output: Reconstruction error (high = anomalous sequence)
 Training: Unsupervised on normal user action sequences
 Use Case: Detect lateral movement, privilege escalation patterns
 ```
+
+#### Model 3: Graph Neural Network (Relationship Anomaly)
+```yaml
+Purpose: Detect unusual relationships and lateral movement
+Algorithm: GraphSAGE or GAT (PyTorch Geometric)
+Input: User-resource access graph, service dependency graph
+Output: Link prediction score, community anomaly score
+Training: Semi-supervised on normal access patterns
+Use Case: Insider threats, service account compromise
+```
