@@ -287,3 +287,12 @@ def process_event_stream(raw_event):
 - action_pair_frequency = {("login", "read_db"): 0.95, ...}
 - rare_action_sequences = detect_rare_ngrams(action_sequence)
 ```
+
+#### C. Graph Features
+```python
+# Example graph features
+- service_dependency_violation = bool  # service A calling service D (never before)
+- user_to_resource_distance = int      # graph hops from user's normal resources
+- network_community_id = int           # which cluster user belongs to
+- centrality_score = float             # how central user is in access graph
+```
