@@ -375,3 +375,25 @@ Output: Contextual risk score
 Training: Self-supervised (masked event prediction)
 Use Case: Context-aware risk scoring, intent classification
 ```
+
+**Ensemble Strategy**:
+```python
+# Weighted ensemble
+final_risk_score = (
+    0.30 * isolation_forest_score +
+    0.25 * lstm_autoencoder_score +
+    0.25 * graph_neural_net_score +
+    0.20 * transformer_score
+)
+
+# Confidence calculation
+confidence = calculate_model_agreement(all_scores)
+```
+
+**MVP Implementation**:
+- Start with Isolation Forest (Phase 2)
+- Add LSTM Autoencoder (Phase 2)
+- Add Graph Neural Net (Phase 3)
+- Add Transformer (Phase 3)
+
+---
