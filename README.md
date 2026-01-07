@@ -9,3 +9,10 @@ The system ingests identity, cloud, network, and API telemetry to build behavior
 ZTBF is cloud-native, scalable, and privacy-aware, with explainable security decisions designed for SOC and audit use cases.
 
 This project is currently in the research and architecture phase and is intended for defensive security research and education only.
+
+### Documentation
+
+<p align="center">
+  <a href="research/threat_model.md">← Threat Model README</a> 
+  <a href="architecture/system_design.md">System Design →</a>
+</p>
