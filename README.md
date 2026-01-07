@@ -12,7 +12,7 @@ This project is currently in the research and architecture phase and is intended
 
 ### Documentation
 
-<p align="center">
-  <a href="research/threat_model.md">← Threat Model README</a> 
-  <a href="architecture/system_design.md">System Design →</a>
+<p align="left">
+  <a href="research/threat_model.md">Threat Model</a> |
+  <a href="architecture/system_design.md">System Architecture</a>
 </p>
