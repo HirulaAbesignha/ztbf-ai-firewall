@@ -455,3 +455,11 @@ class EnforcementOrchestrator:
 <img src="../diagrams/ui/EventTimeline.png" alt="Event Timeline: john.doe (2025-01-01)">
 
 ---
+
+**Technologies**:
+- **Backend**: FastAPI (Python)
+- **Frontend**: React + Recharts (data visualization)
+- **Real-time**: WebSockets for live updates
+- **Database**: PostgreSQL for event storage, Redis for caching
+
+---
