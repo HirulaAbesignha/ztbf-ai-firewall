@@ -423,3 +423,13 @@ class EnforcementOrchestrator:
 - Email alerts (optional)
 
 ---
+
+### 8. DASHBOARD & ANALYST INTERFACE
+
+**Purpose**: Provide visibility and control to security analysts
+
+**Dashboard Components**:
+
+#### Real-time Alerts View
+
+<img src="../diagrams/ui/HighRisk.png" alt="High-Risk Events (Last Hour)">
