@@ -14,5 +14,5 @@ This project is currently in the research and architecture phase and is intended
 
 <p align="left">
   <a href="research/threat_model.md">Threat Model</a> |
-  <a href="architecture/system_design.md">System Design</a>
+  <a href="architecture/system_design.md">System Architecture</a>
 </p>
