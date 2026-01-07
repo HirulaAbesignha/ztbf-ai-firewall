@@ -430,6 +430,16 @@ class EnforcementOrchestrator:
 
 **Dashboard Components**:
 
+---
+
 #### Real-time Alerts View
 
 <img src="../diagrams/ui/HighRisk.png" alt="High-Risk Events (Last Hour)">
+
+---
+
+#### Risk Trend Analytics
+
+<img src="../diagrams/ui/RiskScore.png" alt="Risk Score Distribution (24h)">
+
+---
