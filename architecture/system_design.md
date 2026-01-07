@@ -450,3 +450,8 @@ class EnforcementOrchestrator:
 
 ---
 
+#### Investigation Interface
+
+<img src="../diagrams/ui/EventTimeline.png" alt="Event Timeline: john.doe (2025-01-01)">
+
+---
