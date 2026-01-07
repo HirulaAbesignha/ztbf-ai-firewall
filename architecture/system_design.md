@@ -471,3 +471,16 @@ class EnforcementOrchestrator:
 ---
 
 <img src="../diagrams/BoundaryMap.png" alt="Trust Boundary Map">
+
+---
+
+### Security Controls by Boundary
+
+| Boundary | Controls |
+|----------|----------|
+| **Untrusted → DMZ** | TLS 1.3, API authentication, rate limiting, input validation |
+| **DMZ → Processing** | Network segmentation, service accounts, encryption at rest |
+| **Processing → Trusted** | Role-based access control, audit logging, data encryption |
+| **Trusted → Control Plane** | MFA, privileged access management, change management |
+
+---
