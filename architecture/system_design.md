@@ -424,7 +424,7 @@ class EnforcementOrchestrator:
 
 ---
 
-### 8. DASHBOARD & ANALYST INTERFACE
+### 8. DASHBOARD & ANALYST INTERFACE ( PROTOTYPE )
 
 **Purpose**: Provide visibility and control to security analysts
 
@@ -443,3 +443,10 @@ class EnforcementOrchestrator:
 <img src="../diagrams/ui/RiskScore.png" alt="Risk Score Distribution (24h)">
 
 ---
+
+#### Entity Behavior Profile
+
+<img src="../diagrams/ui/UserProfile.png" alt="User Profile: john.doe@company.com">
+
+---
+
