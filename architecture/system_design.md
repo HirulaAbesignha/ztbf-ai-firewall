@@ -463,3 +463,11 @@ class EnforcementOrchestrator:
 - **Database**: PostgreSQL for event storage, Redis for caching
 
 ---
+
+## Trust Boundaries
+
+### Trust Boundary Map
+
+---
+
+<img src="../diagrams/BoundaryMap.png" alt="Trust Boundary Map">
