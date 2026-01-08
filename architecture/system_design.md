@@ -484,3 +484,81 @@ class EnforcementOrchestrator:
 | **Trusted → Control Plane** | MFA, privileged access management, change management |
 
 ---
+
+## Data Flow Overview
+
+### Event Journey (End-to-End)
+
+```
+1. EVENT GENERATION
+   User: john.doe logs in from Tokyo
+   Source: Azure AD
+   
+   ↓
+
+2. LOG EMISSION
+   Azure AD → JSON event → HTTPS POST to ZTBF ingestion API
+   
+   ↓
+
+3. INGESTION
+   API validates schema → Publishes to Kafka topic "auth-events"
+   
+   ↓
+
+4. STREAM PROCESSING
+   Spark consumer reads from Kafka
+   Normalizes: {"user_id": "john.doe", "action": "login", ...}
+   Enriches: GeoIP → Tokyo, Japan (lat/lon)
+   Persists: Raw event to S3/MinIO (audit trail)
+   
+   ↓
+
+5. FEATURE ENGINEERING
+   Extract features:
+     - last_login_location: New York
+     - geographic_distance: 10,847 km
+     - time_since_last_login: 15 minutes
+     - impossible_travel: TRUE (can't travel 10,847 km in 15 min)
+   Store in Redis for real-time lookup
+   
+   ↓
+
+6. MODEL INFERENCE
+   Isolation Forest: anomaly_score = 0.95 (high)
+   LSTM Autoencoder: sequence_error = 2.3 (unusual)
+   Graph Neural Net: relationship_score = 0.88 (suspicious)
+   Ensemble: weighted_score = 0.92
+   
+   ↓
+
+7. RISK SCORING
+   Base risk: 92/100
+   Context: User is admin → risk *= 1.3 → 119 (capped at 100)
+   Final risk: 100/100
+   Decision: BLOCK
+   
+   ↓
+
+8. EXPLAINABILITY
+   SHAP: Top features:
+     - impossible_travel: +35 points
+     - admin_user: +28 points
+     - new_location: +20 points
+   Reason: "Impossible travel detected for admin user"
+   
+   ↓
+
+9. ENFORCEMENT
+   Action: BLOCK
+   Integrations:
+     - Azure AD: Revoke session token
+     - Alert: Send to SOC dashboard
+     - Log: Record incident
+   
+   ↓
+
+10. DASHBOARD UPDATE
+    Real-time WebSocket → Analyst sees alert
+    Analyst: Reviews event, approves/escalates
+```
