@@ -562,3 +562,11 @@ class EnforcementOrchestrator:
     Real-time WebSocket → Analyst sees alert
     Analyst: Reviews event, approves/escalates
 ```
+
+### Data Flow Diagram
+
+---
+
+<img src="../diagrams/DataFlow.png" alt="Data Flow Diagram">
+
+---
