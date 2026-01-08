@@ -724,3 +724,52 @@ Monitoring:
 ```
 
 ---
+
+## Development Roadmap
+
+### Phase 0: Foundation (Current)
+- Threat model definition
+- System architecture design
+- Trust boundaries
+- Repository structure
+
+### Phase 1: Data Pipeline
+- Ingestion API
+- Kafka/Redpanda setup
+- Stream processing
+- Storage layer
+- Synthetic log generator
+
+### Phase 2: AI Models
+- Feature engineering
+- Isolation Forest (anomaly detection)
+- LSTM Autoencoder (sequence anomaly)
+- Model training pipeline
+- Model evaluation metrics
+
+### Phase 3: Risk Engine
+- Risk scoring logic
+- Decision engine
+- Policy rule engine
+- Explainability (SHAP)
+
+### Phase 4: Enforcement
+- Enforcement orchestrator
+- Integration framework
+- Alert routing
+- Incident logging
+
+### Phase 5: Dashboard
+- Backend API
+- Frontend UI
+- Real-time updates
+- Investigation interface
+
+### Phase 6: Testing & Validation
+- Unit tests
+- Integration tests
+- Adversarial testing
+- Load testing
+- Security testing
+
+---
