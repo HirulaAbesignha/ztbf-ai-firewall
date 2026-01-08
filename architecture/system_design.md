@@ -652,3 +652,47 @@ class EnforcementOrchestrator:
 - Performance monitoring
 
 ---
+
+## Technology Stack (MVP Free-First)
+
+### Development Environment
+```yaml
+Containerization:
+  - Docker: Container runtime
+  - Docker Compose: Multi-container orchestration
+
+Local Kubernetes:
+  - Kind (Kubernetes in Docker): Lightweight K8s cluster
+  - kubectl: Kubernetes CLI
+
+Message Queue:
+  - Redpanda: Kafka-compatible (lighter than Kafka)
+  - Alternative: RabbitMQ (simpler setup)
+
+Storage:
+  - MinIO: S3-compatible object storage (local)
+  - PostgreSQL: Relational data (user profiles, incidents)
+  - Redis: Feature cache, session storage
+
+Stream Processing:
+  - Python + Kafka Consumer: Custom streaming (Phase 1)
+  - Apache Spark: Batch + streaming (Phase 2+)
+
+Machine Learning:
+  - scikit-learn: Isolation Forest, classical ML
+  - TensorFlow/PyTorch: Deep learning models
+  - PyTorch Geometric: Graph neural networks
+
+Backend API:
+  - FastAPI: Python web framework
+  - Pydantic: Data validation
+
+Frontend:
+  - React: UI framework
+  - Recharts: Data visualization
+  - Tailwind CSS: Styling
+
+Monitoring (Optional):
+  - Prometheus: Metrics collection
+  - Grafana: Dashboards
+```
