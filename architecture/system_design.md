@@ -563,10 +563,23 @@ class EnforcementOrchestrator:
     Analyst: Reviews event, approves/escalates
 ```
 
-### Data Flow Diagram
-
 ---
+
+### Data Flow Diagram
 
 <img src="../diagrams/DataFlow.png" alt="Data Flow Diagram">
 
 ---
+
+## Security Assumptions & Risks
+
+### Assumptions
+
+| Assumption | Mitigation if False |
+|------------|---------------------|
+| Identity provider logs are accurate | Cross-reference with multiple sources |
+| Timestamps are synchronized (NTP) | Implement time drift detection |
+| Initial 30-day baseline is attack-free | Continuous model retraining, outlier removal |
+| Attackers don't have insider knowledge of ML models | Adversarial testing, model updates |
+| Network connectivity is reliable | Buffering, offline mode, retry logic |
+
