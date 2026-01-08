@@ -696,3 +696,31 @@ Monitoring (Optional):
   - Prometheus: Metrics collection
   - Grafana: Dashboards
 ```
+
+### Production Upgrade Path (Cloud-Native)
+```yaml
+Message Queue:
+  - AWS Kinesis / Azure Event Hubs / Kafka (managed)
+
+Storage:
+  - AWS S3 / Azure Blob Storage: Object storage
+  - AWS RDS / Azure SQL: Managed PostgreSQL
+  - AWS ElastiCache / Azure Cache: Managed Redis
+
+Stream Processing:
+  - AWS Kinesis Analytics / Azure Stream Analytics
+  - Databricks (managed Spark)
+
+Machine Learning:
+  - AWS SageMaker / Azure ML: Model training & deployment
+  - MLflow: Model versioning & registry
+
+Container Orchestration:
+  - AWS EKS / Azure AKS / GKE: Managed Kubernetes
+
+Monitoring:
+  - AWS CloudWatch / Azure Monitor
+  - Datadog / New Relic
+```
+
+---
