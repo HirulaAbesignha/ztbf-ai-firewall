@@ -583,3 +583,4 @@ class EnforcementOrchestrator:
 | Attackers don't have insider knowledge of ML models | Adversarial testing, model updates |
 | Network connectivity is reliable | Buffering, offline mode, retry logic |
 
+### Risks & Mitigations
