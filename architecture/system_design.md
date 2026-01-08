@@ -584,3 +584,71 @@ class EnforcementOrchestrator:
 | Network connectivity is reliable | Buffering, offline mode, retry logic |
 
 ### Risks & Mitigations
+
+#### Risk 1: False Positives (High Impact)
+**Scenario**: Legitimate user blocked due to unusual but valid behavior
+**Mitigation**:
+- Graduated response (alert before block)
+- Analyst feedback loop
+- User appeal process
+- Confidence thresholds
+- Contextual policy rules
+
+#### Risk 2: Model Evasion (Medium Impact)
+**Scenario**: Attacker learns to mimic normal behavior
+**Mitigation**:
+- Multi-model ensemble (harder to evade all)
+- Adversarial testing
+- Continuous model updates
+- Incorporate threat intelligence
+- Graph-based detection (relationship anomalies)
+
+#### Risk 3: Concept Drift (Medium Impact)
+**Scenario**: User behavior changes legitimately, model becomes outdated
+**Mitigation**:
+- Continuous retraining (weekly)
+- Sliding window baselines
+- Seasonal pattern detection
+- Analyst feedback integration
+- A/B testing for model updates
+
+#### Risk 4: Cold Start Problem (Medium Impact)
+**Scenario**: New users/services have no baseline
+**Mitigation**:
+- Role-based default profiles
+- Conservative initial trust
+- Accelerated baseline learning (7-day fast track)
+- Peer group comparison
+- Manual override capability
+
+#### Risk 5: Data Privacy Violation (High Impact)
+**Scenario**: Sensitive user data exposed or misused
+**Mitigation**:
+- Metadata-only analysis (no payload inspection)
+- Data minimization (only collect what's needed)
+- Encryption at rest and in transit
+- Anonymization where possible
+- Strict access controls
+- Regular privacy audits
+
+#### Risk 6: System Compromise (Critical Impact)
+**Scenario**: ZTBF itself is compromised by attacker
+**Mitigation**:
+- Least privilege architecture
+- Multi-factor authentication for admin access
+- Audit logging of all changes
+- Immutable infrastructure (IaC)
+- Network segmentation
+- Regular security assessments
+
+#### Risk 7: Scalability Bottleneck (Medium Impact)
+**Scenario**: System can't handle traffic spikes
+**Mitigation**:
+- Horizontal scaling (all components stateless)
+- Load balancing
+- Auto-scaling policies
+- Circuit breakers
+- Graceful degradation (skip models under load)
+- Performance monitoring
+
+---
