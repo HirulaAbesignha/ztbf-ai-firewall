@@ -773,3 +773,23 @@ Monitoring:
 - Security testing
 
 ---
+
+## Constraints & Trade-offs
+
+### MVP Constraints
+1. **Free-first**: No paid cloud services during development
+2. **Local-only**: Everything runs on developer machine
+3. **Simulated enforcement**: No real blocking in MVP
+4. **Sample data**: Synthetic logs, no real production data
+
+### Architectural Trade-offs
+
+| Decision | Trade-off | Justification |
+|----------|-----------|---------------|
+| Python for streaming | Performance vs. simplicity | Faster development, good enough for MVP |
+| Ensemble models | Complexity vs. accuracy | Higher accuracy justifies complexity |
+| Real-time inference | Latency vs. thoroughness | Critical for blocking, accept some latency |
+| Metadata-only | Visibility vs. privacy | Privacy-first design, compliance-friendly |
+| Cloud-agnostic design | Portability vs. optimization | Future-proof, multi-cloud capable |
+
+---
