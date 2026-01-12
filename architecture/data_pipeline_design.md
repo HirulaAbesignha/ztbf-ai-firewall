@@ -15,3 +15,29 @@ This document defines the **Behavior Data Collection and Streaming Pipeline** fo
 - **ML-optimized**: Schema designed for feature engineering
 
 ---
+
+## Architecture Overview
+
+### Design Principles
+
+1. **Streaming-First with Micro-Batching**
+   - Primary: Async streaming (Python asyncio)
+   - Fallback: Micro-batch processing (5-second windows)
+   - No mandatory Kafka for MVP
+
+2. **Backpressure Support**
+   - In-memory queues with overflow to disk
+   - Graceful degradation under load
+   - Circuit breaker patterns
+
+3. **Plug-and-Play Sources**
+   - Standardized ingestion API
+   - Source-specific adapters
+   - Easy to add new sources later
+
+4. **Lambda Architecture (Simplified)**
+   - Speed Layer: Real-time streaming (asyncio)
+   - Batch Layer: Historical processing (Pandas/Polars)
+   - Serving Layer: Unified query interface
+
+---
