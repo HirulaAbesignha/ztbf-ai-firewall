@@ -48,3 +48,14 @@ class LocationContext(BaseModel):
     
     class Config:
         extra = "forbid"
+
+class PerformanceMetrics(BaseModel):
+    """Performance and resource usage metrics"""
+    latency_ms: Optional[int] = None
+    request_size_bytes: Optional[int] = None
+    response_size_bytes: Optional[int] = None
+    cpu_usage_percent: Optional[float] = None
+    memory_usage_mb: Optional[float] = None
+    
+    class Config:
+        extra = "forbid"
