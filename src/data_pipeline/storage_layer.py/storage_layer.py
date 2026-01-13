@@ -43,3 +43,33 @@ class StorageConfig:
     def __post_init__(self):
         if self.partition_by is None:
             self.partition_by = ["date", "hour", "source_system"]
+
+class StorageLayer:
+    """
+    Manages event storage across hot/warm/cold tiers
+    Provides read/write interfaces for event data
+    """
+    
+    def __init__(self, config: StorageConfig):
+        self.config = config
+        self.s3_client = self._init_s3_client()
+        self._ensure_bucket_exists()
+        
+    def _init_s3_client(self):
+        """Initialize S3/MinIO client"""
+        if self.config.backend == "minio":
+            return boto3.client(
+                's3',
+                endpoint_url=self.config.endpoint_url,
+                aws_access_key_id=self.config.access_key,
+                aws_secret_access_key=self.config.secret_key,
+                config=Config(signature_version='s3v4'),
+                region_name=self.config.region
+            )
+        else:  # AWS S3
+            return boto3.client(
+                's3',
+                aws_access_key_id=self.config.access_key,
+                aws_secret_access_key=self.config.secret_key,
+                region_name=self.config.region
+            )
