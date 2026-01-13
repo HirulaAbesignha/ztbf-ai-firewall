@@ -73,3 +73,21 @@ class StorageLayer:
                 aws_secret_access_key=self.config.secret_key,
                 region_name=self.config.region
             )
+
+    def _ensure_bucket_exists(self):
+        """Create bucket if it doesn't exist"""
+        try:
+            self.s3_client.head_bucket(Bucket=self.config.bucket_name)
+        except:
+            print(f"Creating bucket: {self.config.bucket_name}")
+            if self.config.backend == "minio":
+                self.s3_client.create_bucket(Bucket=self.config.bucket_name)
+            else:
+                # S3 requires location constraint for non-us-east-1
+                if self.config.region == "us-east-1":
+                    self.s3_client.create_bucket(Bucket=self.config.bucket_name)
+                else:
+                    self.s3_client.create_bucket(
+                        Bucket=self.config.bucket_name,
+                        CreateBucketConfiguration={'LocationConstraint': self.config.region}
+                    )
