@@ -91,3 +91,31 @@ class StorageLayer:
                         Bucket=self.config.bucket_name,
                         CreateBucketConfiguration={'LocationConstraint': self.config.region}
                     )
+
+    def write_events(self, events: List[Dict], tier: str = "hot"):
+        """
+        Write events to storage
+        
+        Args:
+            events: List of event dictionaries (unified schema)
+            tier: Storage tier ("hot", "warm", or "cold")
+        """
+        if not events:
+            return
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(events)
+        
+        # Ensure timestamp is datetime
+        if 'timestamp' in df.columns:
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+        
+        # Add partition columns
+        df['date'] = df['timestamp'].dt.date.astype(str)
+        df['hour'] = df['timestamp'].dt.hour
+        
+        # Group by partition keys
+        partition_cols = ['date', 'hour', 'source_system']
+        for partition_values, group_df in df.groupby(partition_cols):
+            self._write_partition(group_df, partition_values, tier)
+    
