@@ -27,3 +27,24 @@ class EventType(str, Enum):
     DATA_ACCESS = "data_access"
     NETWORK_CONNECTION = "network_connection"
     ADMIN_ACTION = "admin_action"
+
+class RiskLevel(str, Enum):
+    """Risk level indicator"""
+    NONE = "none"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
+class LocationContext(BaseModel):
+    """Geographic location information"""
+    city: Optional[str] = None
+    country: Optional[str] = None
+    country_code: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    timezone: Optional[str] = None
+    
+    class Config:
+        extra = "forbid"
