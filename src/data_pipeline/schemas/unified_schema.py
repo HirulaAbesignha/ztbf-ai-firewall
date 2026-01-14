@@ -78,3 +78,17 @@ class ResourceContext(BaseModel):
     
     class Config:
         extra = "allow"  # Allow source-specific fields
+
+class EntityMetadata(BaseModel):
+    """Metadata about the entity (user/service)"""
+    department: Optional[str] = None
+    role: Optional[str] = None
+    job_title: Optional[str] = None
+    manager: Optional[str] = None
+    is_admin: bool = False
+    is_privileged: bool = False
+    account_creation_date: Optional[datetime] = None
+    last_password_change: Optional[datetime] = None
+    
+    class Config:
+        extra = "allow"
