@@ -92,3 +92,27 @@ class EntityMetadata(BaseModel):
     
     class Config:
         extra = "allow"
+
+class TemporalContext(BaseModel):
+    """Temporal features extracted from timestamp"""
+    hour_of_day: int = Field(..., ge=0, le=23)
+    day_of_week: int = Field(..., ge=0, le=6)  # 0=Monday, 6=Sunday
+    is_weekend: bool
+    is_business_hours: bool  # 9 AM - 5 PM local time
+    week_of_year: int = Field(..., ge=1, le=53)
+    month: int = Field(..., ge=1, le=12)
+    
+    class Config:
+        extra = "forbid"
+
+
+class PerformanceMetrics(BaseModel):
+    """Performance and resource usage metrics"""
+    latency_ms: Optional[int] = None
+    request_size_bytes: Optional[int] = None
+    response_size_bytes: Optional[int] = None
+    cpu_usage_percent: Optional[float] = None
+    memory_usage_mb: Optional[float] = None
+    
+    class Config:
+        extra = "forbid"
