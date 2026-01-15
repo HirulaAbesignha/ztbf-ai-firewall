@@ -119,3 +119,38 @@ class StorageLayer:
         for partition_values, group_df in df.groupby(partition_cols):
             self._write_partition(group_df, partition_values, tier)
     
+    def _write_partition(self, df: pd.DataFrame, partition_values: tuple, tier: str):
+        """Write a single partition to storage"""
+        date, hour, source = partition_values
+        
+        # Construct S3 key (path)
+        key = f"{tier}/date={date}/hour={hour:02d}/source={source}/events.parquet"
+        
+        # Select compression based on tier
+        compression_map = {
+            "hot": self.config.hot_compression,
+            "warm": self.config.warm_compression,
+            "cold": self.config.cold_compression
+        }
+        compression = compression_map.get(tier, "snappy")
+        
+        # Convert to Parquet bytes
+        table = pa.Table.from_pandas(df)
+        
+        # Write to buffer
+        import io
+        buffer = io.BytesIO()
+        pq.write_table(table, buffer, compression=compression)
+        buffer.seek(0)
+        
+        # Upload to S3/MinIO
+        try:
+            self.s3_client.put_object(
+                Bucket=self.config.bucket_name,
+                Key=key,
+                Body=buffer.getvalue()
+            )
+            print(f"Wrote {len(df)} events to {tier}/{key}")
+        except Exception as e:
+            print(f"Error writing to storage: {e}")
+            raise
