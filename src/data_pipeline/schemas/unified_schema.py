@@ -116,3 +116,54 @@ class PerformanceMetrics(BaseModel):
     
     class Config:
         extra = "forbid"
+
+class UnifiedEvent(BaseModel):
+    """
+    Unified event schema - canonical representation of all security events
+    
+    This schema is the result of normalizing and enriching events from
+    all data sources (Azure AD, CloudTrail, API Gateway, etc.)
+    """
+    
+    # ===== CORE IDENTITY =====
+    entity_id: str = Field(..., description="Unique identifier for the entity (user/service)")
+    entity_type: EntityType = Field(..., description="Type of entity")
+    session_id: Optional[str] = Field(None, description="Session or correlation ID")
+    
+    # ===== EVENT METADATA =====
+    event_type: EventType = Field(..., description="High-level event category")
+    event_subtype: str = Field(..., description="Specific event action (e.g., 'sign_in', 'AssumeRole')")
+    timestamp: datetime = Field(..., description="Event occurrence time (UTC)")
+    success: bool = Field(..., description="Whether the action succeeded")
+    error_code: Optional[str] = Field(None, description="Error code if action failed")
+    error_message: Optional[str] = Field(None, description="Error description if action failed")
+    
+    # ===== NETWORK CONTEXT =====
+    source_ip: str = Field(..., description="Source IP address")
+    source_ip_anonymized: Optional[str] = Field(None, description="Anonymized IP (last octet masked)")
+    user_agent: Optional[str] = Field(None, description="User agent string")
+    
+    # ===== ENRICHED CONTEXT =====
+    location: Optional[LocationContext] = Field(None, description="Geographic location")
+    device: Optional[DeviceFingerprint] = Field(None, description="Device information")
+    resource: ResourceContext = Field(..., description="Resource being accessed")
+    entity_metadata: Optional[EntityMetadata] = Field(None, description="Entity metadata")
+    temporal: Optional[TemporalContext] = Field(None, description="Temporal features")
+    performance: Optional[PerformanceMetrics] = Field(None, description="Performance metrics")
+    
+    # ===== RISK INDICATORS =====
+    risk_level: Optional[RiskLevel] = Field(None, description="Pre-computed risk level (if available)")
+    risk_score: Optional[float] = Field(None, ge=0, le=100, description="Risk score 0-100")
+    risk_factors: Optional[List[str]] = Field(None, description="List of risk factors identified")
+    
+    # ===== METADATA =====
+    source_system: str = Field(..., description="Source system (azure_ad, cloudtrail, api_gateway)")
+    ingestion_timestamp: datetime = Field(..., description="When event was ingested by ZTBF")
+    processing_timestamp: Optional[datetime] = Field(None, description="When event was processed")
+    raw_event_id: Optional[str] = Field(None, description="Original event ID from source")
+    pipeline_version: str = Field(default="1.0.0", description="Pipeline version")
+    
+    # ===== SOURCE-SPECIFIC FIELDS =====
+    # These are preserved for debugging and compliance
+    source_specific: Optional[Dict] = Field(None, description="Source-specific fields")
+    
