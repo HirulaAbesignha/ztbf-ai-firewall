@@ -154,3 +154,62 @@ class StorageLayer:
         except Exception as e:
             print(f"Error writing to storage: {e}")
             raise
+
+    def read_events(
+        self,
+        start_time: datetime,
+        end_time: datetime,
+        source_system: Optional[str] = None,
+        tier: Optional[str] = None
+    ) -> pd.DataFrame:
+        """
+        Read events from storage
+        
+        Args:
+            start_time: Start of time range
+            end_time: End of time range
+            source_system: Filter by source (e.g., "azure_ad")
+            tier: Read from specific tier, or None for all tiers
+        
+        Returns:
+            DataFrame of events
+        """
+        # Determine which tiers to read from
+        if tier:
+            tiers = [tier]
+        else:
+            tiers = self._determine_tiers(start_time, end_time)
+        
+        # Build list of S3 prefixes to scan
+        prefixes = []
+        current_date = start_time.date()
+        end_date = end_time.date()
+        
+        while current_date <= end_date:
+            date_str = current_date.strftime("%Y-%m-%d")
+            
+            for tier_name in tiers:
+                if source_system:
+                    prefix = f"{tier_name}/date={date_str}/hour=*/source={source_system}/"
+                else:
+                    prefix = f"{tier_name}/date={date_str}/"
+                
+                prefixes.append(prefix)
+            
+            current_date += timedelta(days=1)
+        
+        # Read all matching partitions
+        dfs = []
+        for prefix in prefixes:
+            partition_dfs = self._read_prefix(prefix)
+            dfs.extend(partition_dfs)
+        
+        if not dfs:
+            return pd.DataFrame()
+        
+        # Concatenate and filter by exact time range
+        df = pd.concat(dfs, ignore_index=True)
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
+        
+        return df
