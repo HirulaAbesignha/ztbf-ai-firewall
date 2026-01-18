@@ -213,3 +213,25 @@ class StorageLayer:
         df = df[(df['timestamp'] >= start_time) & (df['timestamp'] <= end_time)]
         
         return df
+
+    def _determine_tiers(self, start_time: datetime, end_time: datetime) -> List[str]:
+        """Determine which storage tiers to read from based on time range"""
+        now = datetime.utcnow()
+        tiers = []
+        
+        # Check if we need hot tier (last 7 days)
+        hot_cutoff = now - timedelta(days=self.config.hot_retention_days)
+        if end_time >= hot_cutoff:
+            tiers.append("hot")
+        
+        # Check if we need warm tier (7-30 days)
+        warm_cutoff = now - timedelta(days=self.config.warm_retention_days)
+        if start_time < hot_cutoff and end_time >= warm_cutoff:
+            tiers.append("warm")
+        
+        # Check if we need cold tier (30-90 days)
+        cold_cutoff = now - timedelta(days=self.config.cold_retention_days)
+        if start_time < warm_cutoff and end_time >= cold_cutoff:
+            tiers.append("cold")
+        
+        return tiers if tiers else ["hot"]  # Default to hot if no tiers match
