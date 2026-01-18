@@ -166,4 +166,21 @@ class UnifiedEvent(BaseModel):
     # ===== SOURCE-SPECIFIC FIELDS =====
     # These are preserved for debugging and compliance
     source_specific: Optional[Dict] = Field(None, description="Source-specific fields")
+
+    class Config:
+        extra = "forbid"
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+    
+    @validator("source_ip_anonymized", always=True)
+    def anonymize_ip(cls, v, values):
+        """Automatically anonymize IP address"""
+        if v is None and "source_ip" in values:
+            ip = values["source_ip"]
+            parts = ip.split(".")
+            if len(parts) == 4:
+                # Mask last octet
+                return f"{parts[0]}.{parts[1]}.{parts[2]}.XXX"
+        return v
     
