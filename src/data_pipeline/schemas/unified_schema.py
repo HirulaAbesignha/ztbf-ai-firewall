@@ -184,3 +184,61 @@ class UnifiedEvent(BaseModel):
                 return f"{parts[0]}.{parts[1]}.{parts[2]}.XXX"
         return v
     
+    def to_feature_dict(self) -> Dict:
+        """
+        Convert to flat dictionary suitable for ML feature engineering
+        Extracts nested fields into top-level features
+        """
+        features = {
+            # Identity
+            "entity_id_hash": hash(self.entity_id),  # Anonymized
+            "entity_type": self.entity_type.value,
+            "is_user": self.entity_type == EntityType.USER,
+            "is_service": self.entity_type == EntityType.SERVICE,
+            
+            # Event
+            "event_type": self.event_type.value,
+            "event_subtype": self.event_subtype,
+            "success": self.success,
+            
+            # Network
+            "source_ip_hash": hash(self.source_ip),  # Anonymized
+            
+            # Location
+            "location_country": self.location.country if self.location else None,
+            "location_latitude": self.location.latitude if self.location else None,
+            "location_longitude": self.location.longitude if self.location else None,
+            
+            # Device
+            "device_id_hash": hash(self.device.device_id) if self.device and self.device.device_id else None,
+            "device_type": self.device.device_type if self.device else None,
+            "device_os": self.device.os if self.device else None,
+            "is_mobile": self.device.is_mobile if self.device else False,
+            "is_bot": self.device.is_bot if self.device else False,
+            
+            # Resource
+            "resource_type": self.resource.type,
+            "resource_sensitivity": self.resource.sensitivity_level,
+            "resource_method": self.resource.method,
+            
+            # Entity metadata
+            "is_admin": self.entity_metadata.is_admin if self.entity_metadata else False,
+            "is_privileged": self.entity_metadata.is_privileged if self.entity_metadata else False,
+            
+            # Temporal
+            "hour_of_day": self.temporal.hour_of_day if self.temporal else None,
+            "day_of_week": self.temporal.day_of_week if self.temporal else None,
+            "is_weekend": self.temporal.is_weekend if self.temporal else None,
+            "is_business_hours": self.temporal.is_business_hours if self.temporal else None,
+            
+            # Performance
+            "latency_ms": self.performance.latency_ms if self.performance else None,
+            "request_size_bytes": self.performance.request_size_bytes if self.performance else None,
+            "response_size_bytes": self.performance.response_size_bytes if self.performance else None,
+            
+            # Metadata
+            "timestamp": self.timestamp.isoformat(),
+            "source_system": self.source_system
+        }
+        
+        return {k: v for k, v in features.items() if v is not None}
