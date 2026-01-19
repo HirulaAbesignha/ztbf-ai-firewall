@@ -312,3 +312,26 @@ class APIGatewayLog(BaseModel):
     
     class Config:
         extra = "allow"
+
+# ===== SCHEMA VERSION REGISTRY =====
+SCHEMA_VERSION = "1.0.0"
+
+SCHEMA_REGISTRY = {
+    "unified": UnifiedEvent,
+    "azure_ad": AzureADSignInEvent,
+    "cloudtrail": CloudTrailEvent,
+    "api_gateway": APIGatewayLog
+}
+
+
+def get_schema(schema_name: str) -> BaseModel:
+    """Get schema class by name"""
+    if schema_name not in SCHEMA_REGISTRY:
+        raise ValueError(f"Unknown schema: {schema_name}")
+    return SCHEMA_REGISTRY[schema_name]
+
+
+def validate_event(schema_name: str, event_data: Dict) -> BaseModel:
+    """Validate event against schema"""
+    schema_class = get_schema(schema_name)
+    return schema_class(**event_data)
