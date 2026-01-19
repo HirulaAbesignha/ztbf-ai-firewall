@@ -242,3 +242,73 @@ class UnifiedEvent(BaseModel):
         }
         
         return {k: v for k, v in features.items() if v is not None}
+
+# ===== SOURCE-SPECIFIC SCHEMAS =====
+# These are used for ingestion validation before normalization
+
+class AzureADSignInEvent(BaseModel):
+    """Azure AD Sign-in Log Schema (Microsoft Graph API format)"""
+    id: str
+    createdDateTime: datetime
+    userPrincipalName: str
+    userId: str
+    appId: str
+    appDisplayName: str
+    ipAddress: str
+    clientAppUsed: Optional[str] = None
+    correlationId: Optional[str] = None
+    
+    status: Dict = Field(..., description="Contains errorCode, failureReason, etc.")
+    location: Optional[Dict] = None
+    deviceDetail: Optional[Dict] = None
+    riskLevelDuringSignIn: Optional[str] = None
+    riskLevelAggregated: Optional[str] = None
+    riskDetail: Optional[str] = None
+    riskState: Optional[str] = None
+    
+    class Config:
+        extra = "allow"  # Azure AD has many optional fields
+
+
+class CloudTrailEvent(BaseModel):
+    """AWS CloudTrail Event Schema"""
+    eventVersion: str
+    userIdentity: Dict = Field(..., description="IAM identity information")
+    eventTime: datetime
+    eventSource: str
+    eventName: str
+    awsRegion: str
+    sourceIPAddress: str
+    userAgent: str
+    requestParameters: Optional[Dict] = None
+    responseElements: Optional[Dict] = None
+    requestID: str
+    eventID: str
+    eventType: str
+    recipientAccountId: str
+    
+    errorCode: Optional[str] = None
+    errorMessage: Optional[str] = None
+    resources: Optional[List[Dict]] = None
+    
+    class Config:
+        extra = "allow"
+
+
+class APIGatewayLog(BaseModel):
+    """API Gateway Log Schema (custom)"""
+    timestamp: datetime
+    request_id: str
+    user_id: str
+    method: str
+    endpoint: str
+    status_code: int
+    latency_ms: int
+    request_size_bytes: int
+    response_size_bytes: int
+    source_ip: str
+    user_agent: Optional[str] = None
+    api_key_id: Optional[str] = None
+    
+    class Config:
+        extra = "allow"
