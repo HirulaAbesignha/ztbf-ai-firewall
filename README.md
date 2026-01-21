@@ -152,7 +152,7 @@ Starting February 2025
 ### Core Documentation
 - **[Threat Model](research/threat_model.md)** - Comprehensive security threat analysis
 - **[System Architecture](architecture/system_design.md)** - High-level system design
-- <!-- **[Data Pipeline Design](architecture/data_pipeline_design.md)** - Pipeline internals -->
+<!-- - **[Data Pipeline Design](architecture/data_pipeline_design.md)** - Pipeline internals -->
 
 <!--
 ### Implementation Guides
