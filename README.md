@@ -283,7 +283,7 @@ python src/data_pipeline/generators/synthetic_logs.py \
 - Must be configured according to compliance requirements
 - Professional security consultation recommended
 
-**For security vulnerabilities, please email:** security@your-org.com
+**For security vulnerabilities, please email:** hirulapinibinda01@gmail.com
 
 ---
 
