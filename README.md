@@ -305,8 +305,7 @@ See the [LICENSE](LICENSE) file for details.
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/HirulaAbesignha/ztbf-ai-firewall/issues)
 - **GitHub Discussions**: [Ask questions or share ideas](https://github.com/HirulaAbesignha/ztbf-ai-firewall/discussions)
-- **Email**: ztbf-project@your-org.com
-- **Documentation**: [Full documentation](docs/)
+- **Email**: hirulapinibinda01@gmail.com
 
 ---
 
