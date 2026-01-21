@@ -6,7 +6,7 @@ This project aims to build a **research-grade, enterprise-ready behavioral secur
 
 ---
 
-## 📋 Table of Contents
+<!-- ## 📋 Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
 - [How Can I Contribute?](#how-can-i-contribute)
@@ -20,7 +20,7 @@ This project aims to build a **research-grade, enterprise-ready behavioral secur
 - [Issue Labels](#issue-labels)
 
 ---
-
+-->
 ## 📜 Code of Conduct
 
 This project adheres to a **Code of Conduct** that all contributors must follow:
