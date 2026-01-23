@@ -110,3 +110,156 @@ class SyntheticLogGenerator:
             users.append(user)
         
         return users
+
+    def _create_service_profiles(self) -> List[ServiceProfile]:
+        """Create service account profiles"""
+        services = []
+        
+        # API services
+        for i in range(20):
+            service = ServiceProfile(
+                service_id=f"service_api_{i:02d}",
+                service_name=f"api-service-{i:02d}",
+                service_type="api",
+                source_ips=[f"10.0.{i}.{random.randint(10, 250)}"],
+                typical_endpoints=["/api/data", "/api/compute", "/api/storage"],
+                call_rate_per_minute=random.randint(10, 100),
+                typical_hours=list(range(24))  # 24/7
+            )
+            services.append(service)
+        
+        # Batch services
+        for i in range(5):
+            service = ServiceProfile(
+                service_id=f"service_batch_{i:02d}",
+                service_name=f"batch-job-{i:02d}",
+                service_type="batch",
+                source_ips=[f"10.1.{i}.{random.randint(10, 250)}"],
+                typical_endpoints=["/api/batch", "/api/export"],
+                call_rate_per_minute=5,
+                typical_hours=[0, 1, 2, 3]  # Midnight to 3 AM
+            )
+            services.append(service)
+        
+        return services
+    
+    def _load_locations(self) -> List[Dict]:
+        """Load geographic locations for GeoIP simulation"""
+        return [
+            {"city": "New York", "country": "US", "lat": 40.7128, "lon": -74.0060},
+            {"city": "San Francisco", "country": "US", "lat": 37.7749, "lon": -122.4194},
+            {"city": "London", "country": "UK", "lat": 51.5074, "lon": -0.1278},
+            {"city": "Tokyo", "country": "Japan", "lat": 35.6762, "lon": 139.6503},
+            {"city": "Sydney", "country": "Australia", "lat": -33.8688, "lon": 151.2093},
+            {"city": "Mumbai", "country": "India", "lat": 19.0760, "lon": 72.8777},
+            {"city": "Berlin", "country": "Germany", "lat": 52.5200, "lon": 13.4050},
+            {"city": "Toronto", "country": "Canada", "lat": 43.6532, "lon": -79.3832},
+        ]
+    
+    # ===== NORMAL EVENT GENERATION =====
+    
+    def generate_azure_ad_signin(self, user: UserProfile, timestamp: datetime, anomalous: bool = False) -> Dict:
+        """Generate Azure AD sign-in event"""
+        location = random.choice(user.typical_locations) if not anomalous else random.choice(["Beijing, China", "Moscow, Russia"])
+        device = random.choice(user.typical_devices) if not anomalous else f"unknown_device_{random.randint(1000, 9999)}"
+        ip = random.choice(user.typical_ips) if not anomalous else f"{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}"
+        
+        return {
+            "id": str(uuid.uuid4()),
+            "createdDateTime": timestamp.isoformat() + "Z",
+            "userPrincipalName": user.email,
+            "userId": user.user_id,
+            "appId": "12345678-1234-1234-1234-123456789012",
+            "appDisplayName": "Office 365",
+            "ipAddress": ip,
+            "clientAppUsed": "Browser",
+            "correlationId": str(uuid.uuid4()),
+            
+            "status": {
+                "errorCode": 0 if not anomalous or random.random() > 0.3 else 50126,
+                "failureReason": None if not anomalous else "Invalid credentials",
+                "additionalDetails": None
+            },
+            
+            "location": {
+                "city": location.split(",")[0],
+                "state": None,
+                "countryOrRegion": location.split(", ")[1],
+                "geoCoordinates": {
+                    "latitude": 40.7128,
+                    "longitude": -74.0060
+                }
+            },
+            
+            "deviceDetail": {
+                "deviceId": device,
+                "displayName": device.replace("_", " ").title(),
+                "operatingSystem": "Windows 10",
+                "browser": "Edge 110.0",
+                "isCompliant": True,
+                "isManaged": True
+            },
+            
+            "riskLevelDuringSignIn": "high" if anomalous else random.choice(["none", "low"]),
+            "riskLevelAggregated": "high" if anomalous else "low",
+            "riskDetail": "anomalousActivity" if anomalous else "none",
+            "riskState": "atRisk" if anomalous else "none",
+            
+            # ZTBF metadata
+            "source_type": "azure_ad",
+            "ingestion_timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    
+    def generate_cloudtrail_event(self, user: UserProfile, timestamp: datetime, anomalous: bool = False) -> Dict:
+        """Generate AWS CloudTrail event"""
+        service = random.choice(self.cloud_services)
+        action = random.choice(self.cloud_actions[service])
+        
+        # Anomalous behavior: privilege escalation actions
+        if anomalous:
+            service = "iam"
+            action = random.choice(["CreateAccessKey", "AttachUserPolicy", "CreateUser", "PutUserPolicy"])
+        
+        return {
+            "eventVersion": "1.08",
+            "userIdentity": {
+                "type": "AssumedRole" if anomalous and random.random() > 0.5 else "IAMUser",
+                "principalId": f"AIDAI{random.randint(100000, 999999)}",
+                "arn": f"arn:aws:iam::123456789012:user/{user.email.split('@')[0]}",
+                "accountId": "123456789012",
+                "userName": user.email.split('@')[0]
+            },
+            
+            "eventTime": timestamp.isoformat() + "Z",
+            "eventSource": f"{service}.amazonaws.com",
+            "eventName": action,
+            "awsRegion": "us-east-1",
+            "sourceIPAddress": random.choice(user.typical_ips) if not anomalous else f"{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}",
+            "userAgent": "aws-cli/2.13.0 Python/3.11.4 Windows/10",
+            
+            "requestParameters": {
+                "bucketName": "company-data-bucket" if service == "s3" else None,
+                "userName": f"new_user_{random.randint(1, 100)}" if action == "CreateUser" else None
+            } if not anomalous else {
+                "userName": "backdoor_admin",
+                "policyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+            },
+            
+            "responseElements": {
+                "accessKey": {
+                    "accessKeyId": f"AKIAI{random.randint(100000000000000, 999999999999999)}"
+                } if action == "CreateAccessKey" else None
+            },
+            
+            "requestID": str(uuid.uuid4()),
+            "eventID": str(uuid.uuid4()),
+            "eventType": "AwsApiCall",
+            "recipientAccountId": "123456789012",
+            
+            "errorCode": "AccessDenied" if anomalous and random.random() > 0.7 else None,
+            "errorMessage": "User is not authorized to perform this action" if anomalous and random.random() > 0.7 else None,
+            
+            # ZTBF metadata
+            "source_type": "cloudtrail",
+            "ingestion_timestamp": datetime.utcnow().isoformat() + "Z"
+        }
