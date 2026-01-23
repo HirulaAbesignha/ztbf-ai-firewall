@@ -10,20 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Phase 2: Feature engineering pipeline (target: February 2025)
+- Phase 2: Feature engineering pipeline 
   - Velocity feature extractors
   - Sequence feature extractors
   - Graph feature extractors
   - Temporal feature extractors
   - Feature store (Redis + Parquet)
-- Phase 3: ML model implementations (target: March 2025)
+- Phase 3: ML model implementations
   - Isolation Forest model
   - LSTM Autoencoder
   - Graph Neural Network
   - Transformer model
-- Phase 4: Risk scoring engine (target: May 2025)
-- Phase 5: Real-time dashboard (target: June 2025)
-- Phase 6: Adversarial testing suite (target: July 2025)
+- Phase 4: Risk scoring engine 
+- Phase 5: Real-time dashboard 
+- Phase 6: Adversarial testing suite 
 
 ### Changed
 - [Planned] Improve test coverage from 60% to 90%+
