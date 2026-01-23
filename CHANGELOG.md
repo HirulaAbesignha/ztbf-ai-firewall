@@ -10,34 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Phase 2: Feature engineering pipeline 
-  - Velocity feature extractors
-  - Sequence feature extractors
-  - Graph feature extractors
-  - Temporal feature extractors
-  - Feature store (Redis + Parquet)
-- Phase 3: ML model implementations
-  - Isolation Forest model
-  - LSTM Autoencoder
-  - Graph Neural Network
-  - Transformer model
-- Phase 4: Risk scoring engine 
-- Phase 5: Real-time dashboard 
-- Phase 6: Adversarial testing suite 
 
 ### Changed
-- [Planned] Improve test coverage from 60% to 90%+
-- [Planned] Replace mock GeoIP with MaxMind GeoLite2 database
-- [Planned] Optimize event processing throughput to 50K events/sec
 
 ### Fixed
-- [Planned] Queue overflow handling optimization
-- [Planned] Memory leak in disk buffer connection management
 
 ### Security
-- [Planned] Security audit and penetration testing
-- [Planned] Implement rate limiting with Redis
-- [Planned] Add event deduplication to prevent replay attacks
 
 ---
 
