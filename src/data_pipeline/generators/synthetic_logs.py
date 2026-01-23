@@ -263,3 +263,264 @@ class SyntheticLogGenerator:
             "source_type": "cloudtrail",
             "ingestion_timestamp": datetime.utcnow().isoformat() + "Z"
         }
+
+    def generate_api_gateway_event(self, user: UserProfile, timestamp: datetime, anomalous: bool = False) -> Dict:
+        """Generate API Gateway log event"""
+        endpoint = random.choice(user.typical_endpoints)
+        method = random.choice(["GET", "POST", "PUT", "DELETE"])
+        
+        # Anomalous: data exfiltration pattern
+        if anomalous:
+            endpoint = "/api/customers/export"
+            method = "GET"
+            request_size = random.randint(1024, 10240)  # KB
+            response_size = random.randint(1048576, 10485760)  # MB - large download
+            status_code = 200
+        else:
+            request_size = random.randint(100, 5000)
+            response_size = random.randint(200, 10000)
+            status_code = random.choice([200, 200, 200, 201, 204, 400, 401, 403, 404, 500])
+        
+        return {
+            "timestamp": timestamp.isoformat() + "Z",
+            "request_id": str(uuid.uuid4()),
+            "user_id": user.user_id,
+            "method": method,
+            "endpoint": endpoint,
+            "status_code": status_code,
+            "latency_ms": random.randint(50, 500) if not anomalous else random.randint(2000, 10000),
+            "request_size_bytes": request_size,
+            "response_size_bytes": response_size,
+            "source_ip": random.choice(user.typical_ips) if not anomalous else f"{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}",
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "api_key_id": f"key_{user.user_id}",
+            
+            # ZTBF metadata
+            "source_type": "api_gateway",
+            "ingestion_timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    
+    def generate_normal_events(self, count: int = 1000, time_range_hours: int = 24) -> List[Dict]:
+        """Generate normal user behavior events"""
+        events = []
+        start_time = datetime.utcnow() - timedelta(hours=time_range_hours)
+        
+        for _ in range(count):
+            user = random.choice(self.users)
+            
+            # Generate timestamp within user's typical hours
+            hour_offset = random.uniform(0, time_range_hours)
+            timestamp = start_time + timedelta(hours=hour_offset)
+            
+            # Skip if outside typical hours (with 20% chance of after-hours activity)
+            if timestamp.hour not in user.typical_hours and random.random() > 0.2:
+                continue
+            
+            # Generate different event types
+            event_type = random.choices(
+                ["azure_ad", "cloudtrail", "api_gateway"],
+                weights=[0.2, 0.3, 0.5]
+            )[0]
+            
+            if event_type == "azure_ad":
+                event = self.generate_azure_ad_signin(user, timestamp)
+            elif event_type == "cloudtrail":
+                event = self.generate_cloudtrail_event(user, timestamp)
+            else:
+                event = self.generate_api_gateway_event(user, timestamp)
+            
+            events.append(event)
+        
+        return events
+    
+    # ===== ATTACK SCENARIO GENERATION =====
+    
+    def generate_attack_scenario(self, scenario_type: str) -> List[Dict]:
+        """
+        Generate attack scenario events
+        
+        Scenarios:
+        - credential_theft: Stolen credentials used from unusual location
+        - brute_force: Multiple failed login attempts
+        - privilege_escalation: IAM policy changes
+        - lateral_movement: Service account accessing unusual resources
+        - data_exfiltration: Large data downloads
+        """
+        if scenario_type == "credential_theft":
+            return self._scenario_credential_theft()
+        elif scenario_type == "brute_force":
+            return self._scenario_brute_force()
+        elif scenario_type == "privilege_escalation":
+            return self._scenario_privilege_escalation()
+        elif scenario_type == "lateral_movement":
+            return self._scenario_lateral_movement()
+        elif scenario_type == "data_exfiltration":
+            return self._scenario_data_exfiltration()
+        else:
+            raise ValueError(f"Unknown scenario: {scenario_type}")
+    
+    def _scenario_credential_theft(self) -> List[Dict]:
+        """Impossible travel scenario"""
+        user = random.choice([u for u in self.users if not u.is_admin])
+        events = []
+        base_time = datetime.utcnow()
+        
+        # Normal login from typical location
+        events.append(self.generate_azure_ad_signin(user, base_time, anomalous=False))
+        
+        # 10 minutes later: Login from China (impossible travel)
+        events.append(self.generate_azure_ad_signin(user, base_time + timedelta(minutes=10), anomalous=True))
+        
+        # Follow-up: Suspicious API calls
+        for i in range(5):
+            events.append(self.generate_api_gateway_event(user, base_time + timedelta(minutes=15 + i), anomalous=True))
+        
+        return events
+    
+    def _scenario_brute_force(self) -> List[Dict]:
+        """Brute force attack scenario"""
+        user = random.choice(self.users)
+        events = []
+        base_time = datetime.utcnow()
+        
+        # 20 failed login attempts in 5 minutes
+        for i in range(20):
+            event = self.generate_azure_ad_signin(user, base_time + timedelta(seconds=i * 15), anomalous=True)
+            event["status"]["errorCode"] = 50126  # Invalid credentials
+            events.append(event)
+        
+        # Successful login after brute force
+        events.append(self.generate_azure_ad_signin(user, base_time + timedelta(minutes=6), anomalous=False))
+        
+        return events
+    
+    def _scenario_privilege_escalation(self) -> List[Dict]:
+        """Privilege escalation via IAM"""
+        user = random.choice([u for u in self.users if not u.is_admin])
+        events = []
+        base_time = datetime.utcnow()
+        
+        # User creates access key
+        event1 = self.generate_cloudtrail_event(user, base_time, anomalous=True)
+        event1["eventName"] = "CreateAccessKey"
+        events.append(event1)
+        
+        # User attaches admin policy
+        event2 = self.generate_cloudtrail_event(user, base_time + timedelta(minutes=2), anomalous=True)
+        event2["eventName"] = "AttachUserPolicy"
+        event2["requestParameters"] = {
+            "userName": user.email.split('@')[0],
+            "policyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+        }
+        events.append(event2)
+        
+        # User assumes admin role
+        event3 = self.generate_cloudtrail_event(user, base_time + timedelta(minutes=5), anomalous=True)
+        event3["eventName"] = "AssumeRole"
+        events.append(event3)
+        
+        return events
+    
+    def _scenario_lateral_movement(self) -> List[Dict]:
+        """Service account lateral movement"""
+        service = random.choice([s for s in self.services if s.service_type == "api"])
+        # Create fake user profile for service
+        user = UserProfile(
+            user_id=service.service_id,
+            email=f"{service.service_name}@service.local",
+            name=service.service_name,
+            department="Infrastructure",
+            role="Service",
+            is_admin=False,
+            is_privileged=True,
+            typical_locations=["us-east-1"],
+            typical_devices=["server"],
+            typical_ips=service.source_ips,
+            typical_hours=service.typical_hours,
+            typical_endpoints=service.typical_endpoints,
+            typical_cloud_actions=["GetObject", "PutObject"],
+            avg_logins_per_day=0,
+            avg_api_calls_per_day=service.call_rate_per_minute * 60 * 24
+        )
+        
+        events = []
+        base_time = datetime.utcnow()
+        
+        # Service accessing unusual resources
+        unusual_services = ["iam", "ec2", "rds"]
+        for i, svc in enumerate(unusual_services):
+            event = self.generate_cloudtrail_event(user, base_time + timedelta(minutes=i), anomalous=True)
+            event["eventSource"] = f"{svc}.amazonaws.com"
+            event["eventName"] = random.choice(self.cloud_actions[svc])
+            events.append(event)
+        
+        return events
+    
+    def _scenario_data_exfiltration(self) -> List[Dict]:
+        """Data exfiltration scenario"""
+        user = random.choice(self.users)
+        events = []
+        base_time = datetime.utcnow()
+        
+        # Multiple large data downloads
+        for i in range(10):
+            event = self.generate_api_gateway_event(user, base_time + timedelta(minutes=i), anomalous=True)
+            event["endpoint"] = "/api/customers/export"
+            event["response_size_bytes"] = random.randint(5242880, 52428800)  # 5-50 MB
+            events.append(event)
+        
+        return events
+    
+    async def stream_events_to_api(self, api_url: str, rate: int, duration: int, anomaly_rate: float = 0.05):
+        """
+        Stream events to ingestion API
+        
+        Args:
+            api_url: Base URL of ingestion API (e.g., http://localhost:8000)
+            rate: Events per second
+            duration: Duration in seconds
+            anomaly_rate: Fraction of anomalous events (0.0 to 1.0)
+        """
+        import asyncio
+        import aiohttp
+        
+        total_events = rate * duration
+        interval = 1.0 / rate
+        
+        async with aiohttp.ClientSession() as session:
+            for i in range(total_events):
+                # Generate event
+                is_anomalous = random.random() < anomaly_rate
+                
+                user = random.choice(self.users)
+                timestamp = datetime.utcnow()
+                
+                event_type = random.choice(["azure_ad", "cloudtrail", "api_gateway"])
+                
+                if event_type == "azure_ad":
+                    event = self.generate_azure_ad_signin(user, timestamp, is_anomalous)
+                    endpoint = f"{api_url}/ingest/azure_ad"
+                elif event_type == "cloudtrail":
+                    event = self.generate_cloudtrail_event(user, timestamp, is_anomalous)
+                    endpoint = f"{api_url}/ingest/cloudtrail"
+                else:
+                    event = self.generate_api_gateway_event(user, timestamp, is_anomalous)
+                    endpoint = f"{api_url}/ingest/api_gateway"
+                
+                # Send to API
+                try:
+                    async with session.post(
+                        endpoint,
+                        json=event,
+                        headers={"X-API-Key": "test_key"}
+                    ) as response:
+                        if response.status != 200:
+                            print(f"Error: {response.status}")
+                except Exception as e:
+                    print(f"Failed to send event: {e}")
+                
+                # Sleep to maintain rate
+                await asyncio.sleep(interval)
+                
+                if (i + 1) % 100 == 0:
+                    print(f"Sent {i + 1}/{total_events} events")
