@@ -184,3 +184,62 @@ async def check_rate_limit(api_key: str) -> bool:
     rate_limit_store[api_key].append(now)
     return True
 
+# ===== HEALTH & STATUS ENDPOINTS =====
+
+@app.get("/health")
+async def health_check():
+    """
+    Health check endpoint
+    Returns service health status
+    """
+    return {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "uptime_seconds": (
+            datetime.utcnow() - metrics["api_started_at"]
+        ).total_seconds() if metrics["api_started_at"] else 0,
+        "queue": {
+            "size": event_queue.memory_queue.qsize() if event_queue else 0,
+            "max_size": event_queue.config.max_memory_size if event_queue else 0
+        }
+    }
+
+
+@app.get("/metrics")
+async def get_metrics():
+    """
+    Prometheus-style metrics endpoint
+    Returns operational metrics
+    """
+    queue_size = event_queue.memory_queue.qsize() if event_queue else 0
+    
+    return {
+        "events_ingested_total": metrics["events_ingested_total"],
+        "events_dropped_total": metrics["events_dropped_total"],
+        "events_by_source": metrics["events_by_source"],
+        "errors_total": metrics["errors_total"],
+        "queue_size": queue_size,
+        "queue_utilization": queue_size / event_queue.config.max_memory_size if event_queue else 0,
+        "uptime_seconds": (
+            datetime.utcnow() - metrics["api_started_at"]
+        ).total_seconds() if metrics["api_started_at"] else 0
+    }
+
+
+@app.get("/")
+async def root():
+    """Root endpoint with API information"""
+    return {
+        "service": "ZTBF Ingestion API",
+        "version": "1.0.0",
+        "status": "operational",
+        "endpoints": {
+            "health": "/health",
+            "metrics": "/metrics",
+            "ingest_azure_ad": "/ingest/azure_ad",
+            "ingest_cloudtrail": "/ingest/cloudtrail",
+            "ingest_api_gateway": "/ingest/api_gateway",
+            "ingest_batch": "/ingest/batch"
+        },
+        "documentation": "/docs"
+    }
