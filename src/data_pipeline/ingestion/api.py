@@ -541,3 +541,41 @@ async def ingest_batch(
             "results": results
         }
     )
+
+# ===== ERROR HANDLERS =====
+
+@app.exception_handler(ValidationError)
+async def validation_exception_handler(request: Request, exc: ValidationError):
+    """Handle Pydantic validation errors"""
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "error": "Validation error",
+            "details": exc.errors()
+        }
+    )
+
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exc: Exception):
+    """Handle general exceptions"""
+    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "error": "Internal server error",
+            "message": str(exc)
+        }
+    )
+
+
+# ===== MAIN (for direct execution) =====
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "api:app",
+        host=APIConfig.HOST,
+        port=APIConfig.PORT,
+        reload=True,
+        log_level="info"
+    )
