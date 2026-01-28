@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Ingestion API** (src/data_pipeline/ingestion/api.py) - FastAPI-based ingestion API providing secure, rate-limited event intake (with batch support) from Azure AD, AWS CloudTrail, and API Gateway, using Pydantic validation, API key auth, and robust error handling with health/metrics endpoints.
 
 ### Changed
 
@@ -21,50 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2025-01-10
 
-### Added - Phase 1: Data Pipeline Complete ✅
+### Added - Phase 1: Data Pipeline 
 
 #### Core Infrastructure
-- **Ingestion API** (`src/data_pipeline/ingestion/api.py`)
-  - FastAPI-based HTTP endpoints for event ingestion
-  - Support for 3 data sources: Azure AD, AWS CloudTrail, API Gateway
-  - Schema validation using Pydantic models
-  - API key authentication
-  - Rate limiting (10,000 requests/minute)
-  - Batch ingestion endpoint
-  - Health check and metrics endpoints
-  - Comprehensive error handling
-
-- **Hybrid Queue System** (`src/data_pipeline/ingestion/queue.py`)
-  - In-memory queue with 100K event capacity
-  - SQLite-based disk overflow buffer
-  - Automatic backpressure handling
-  - Queue statistics tracking
-  - Graceful degradation under load
-
-- **Event Normalization** (`src/data_pipeline/processing/normalizer.py`)
-  - Unified event schema for all data sources
-  - Source-specific field mapping
-  - Type conversion and validation
-  - Temporal feature extraction
-  - Entity type detection
-  - Error handling with detailed logging
-
-- **Event Enrichment** (`src/data_pipeline/processing/enricher.py`)
-  - GeoIP lookup (mock database for MVP)
-  - Entity metadata caching
-  - Device fingerprint parsing from user-agent
-  - Resource sensitivity classification
-  - PII anonymization (IP masking, ID hashing)
-  - Configurable enrichment modules
-
-- **Stream Processor** (`src/data_pipeline/processing/processor.py`)
-  - Async parallel processing with 8-16 workers
-  - Micro-batching (100 events per batch)
-  - Retry logic with exponential backoff
-  - Graceful shutdown handling
-  - Real-time statistics reporting
-  - Error recovery mechanisms
-
 - **Storage Layer** (`src/data_pipeline/storage/storage_layer.py`)
   - Three-tier storage architecture (hot/warm/cold)
   - Parquet format for efficient columnar storage
