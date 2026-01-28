@@ -97,10 +97,90 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
-    logger.info("🛑 Shutting down Ingestion API...")
+    logger.info("Shutting down Ingestion API...")
     
     # Log final statistics
     logger.info(f"Final Statistics:")
     logger.info(f"   - Total ingested: {metrics['events_ingested_total']:,}")
     logger.info(f"   - Total dropped: {metrics['events_dropped_total']:,}")
     logger.info(f"   - By source: {metrics['events_by_source']}")
+
+# ===== FASTAPI APP =====
+
+app = FastAPI(
+    title="ZTBF Ingestion API",
+    description="Event ingestion API for Zero-Trust Behavior Firewall",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Add CORS middleware (for local development)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# ===== AUTHENTICATION =====
+
+async def verify_api_key(x_api_key: str = Header(..., alias="X-API-Key")) -> str:
+    """
+    Verify API key from header
+    
+    Args:
+        x_api_key: API key from X-API-Key header
+    
+    Returns:
+        API key if valid
+    
+    Raises:
+        HTTPException: If API key is invalid
+    """
+    if x_api_key not in APIConfig.API_KEYS:
+        logger.warning(f"Invalid API key attempt: {x_api_key[:8]}...")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API key"
+        )
+    return x_api_key
+
+
+# ===== RATE LIMITING =====
+
+# Simple in-memory rate limiter (use Redis in production)
+rate_limit_store: Dict[str, List[datetime]] = {}
+
+async def check_rate_limit(api_key: str) -> bool:
+    """
+    Check if API key has exceeded rate limit
+    
+    Args:
+        api_key: API key to check
+    
+    Returns:
+        True if within limit, False if exceeded
+    """
+    now = datetime.utcnow()
+    window_start = now.replace(second=0, microsecond=0)
+    
+    # Initialize if first request
+    if api_key not in rate_limit_store:
+        rate_limit_store[api_key] = []
+    
+    # Remove old timestamps (older than 1 minute)
+    rate_limit_store[api_key] = [
+        ts for ts in rate_limit_store[api_key]
+        if (now - ts).total_seconds() < 60
+    ]
+    
+    # Check limit
+    if len(rate_limit_store[api_key]) >= APIConfig.RATE_LIMIT_PER_MINUTE:
+        return False
+    
+    # Add current timestamp
+    rate_limit_store[api_key].append(now)
+    return True
+
