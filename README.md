@@ -9,7 +9,7 @@
 
 **Enterprise-grade behavioral security that detects threats traditional firewalls miss**
 
-[Quick Start](#-quick-start) • [Documentation](#documentation) • [Contributing](#-contributing) • [Roadmap](#-roadmap)
+[Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](#contributing) • [Roadmap](#roadmap)
 
 </div>
 
