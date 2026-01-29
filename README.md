@@ -9,7 +9,7 @@
 
 **Enterprise-grade behavioral security that detects threats traditional firewalls miss**
 
-[Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](#-contributing) • [Roadmap](#-roadmap)
+[Quick Start](#-quick-start) • [Documentation](#documentation) • [Contributing](#-contributing) • [Roadmap](#-roadmap)
 
 </div>
 
@@ -149,7 +149,7 @@ Starting February 2025
 
 ---
 
-## Documentation
+##Documentation
 
 ### Core Documentation
 - **[Threat Model](research/threat_model.md)** - Comprehensive security threat analysis
