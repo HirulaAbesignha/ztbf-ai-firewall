@@ -14,6 +14,8 @@
 </div>
 
 ---
+![ztbf](assets/ztbf.jpg)
+---
 
 ## What is ZTBF?
 
