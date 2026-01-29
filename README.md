@@ -149,7 +149,7 @@ Starting February 2025
 
 ---
 
-##Documentation
+## Documentation
 
 ### Core Documentation
 - **[Threat Model](research/threat_model.md)** - Comprehensive security threat analysis
