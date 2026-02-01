@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Ingestion API** (src/data_pipeline/ingestion/api.py) - FastAPI-based ingestion API providing secure, rate-limited event intake (with batch support) from Azure AD, AWS CloudTrail, and API Gateway, using Pydantic validation, API key auth, and robust error handling with health/metrics endpoints.
+- **Ingestion API** (src/data_pipeline/ingestion/api.py) - FastAPI based ingestion API providing secure, rate-limited event intake (with batch support) from Azure AD, AWS CloudTrail, and API Gateway, using Pydantic validation, API key auth, and robust error handling with health/metrics endpoints.
+- **Ingestion queue** (src/data_pipline/ingestion/queue.py) - Initiallized python file 
 
 ### Changed
 

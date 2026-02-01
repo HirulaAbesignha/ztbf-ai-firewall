@@ -65,7 +65,7 @@ ZTBF is cloud-native, scalable, and privacy-aware, with explainable security dec
 ```bash
 # 1. Clone repository
 git clone https://github.com/HirulaAbesignha/ztbf-ai-firewall.git
-cd ztbf
+cd ztbf-ai-firewall
 
 # 2. Run automated setup
 chmod +x scripts/setup_local_env.sh
@@ -189,7 +189,7 @@ We welcome contributions from security researchers, ML engineers, developers, an
 
 ## Repository Structure
 ```
-ai-zero-trust-behavior-firewall/
+ztbf-ai-firewall/
 ├── research/                    # Threat models, research papers
 │   └── threat_model.md
 ├── architecture/                # System architecture docs
