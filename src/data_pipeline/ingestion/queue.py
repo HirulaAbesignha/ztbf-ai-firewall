@@ -424,3 +424,64 @@ class HybridQueue:
         self.disk_buffer.close()
         logger.info("🔄 Hybrid queue closed")
 
+# ===== TESTING UTILITIES =====
+
+async def test_hybrid_queue():
+    """Test hybrid queue functionality"""
+    print("🧪 Testing Hybrid Queue...")
+    
+    # Initialize queue
+    config = QueueConfig(
+        max_memory_size=10,  # Small for testing
+        disk_buffer_path="data/test_queue.db",
+        overflow_strategy="disk"
+    )
+    queue = HybridQueue(config)
+    
+    # Test 1: Put events in memory
+    print("\n📝 Test 1: Put events in memory")
+    for i in range(5):
+        event = {"id": i, "data": f"event_{i}"}
+        success = await queue.put(event)
+        print(f"   Put event {i}: {'✅' if success else '❌'}")
+    
+    print(f"   Queue size: {queue.qsize()}")
+    
+    # Test 2: Fill memory and overflow to disk
+    print("\n📝 Test 2: Overflow to disk")
+    for i in range(5, 20):
+        event = {"id": i, "data": f"event_{i}"}
+        success = await queue.put(event)
+        print(f"   Put event {i}: {'✅' if success else '❌'}")
+    
+    print(f"   Queue size: {queue.qsize()}")
+    stats = queue.get_stats()
+    print(f"   Overflowed: {stats['overflowed']}")
+    
+    # Test 3: Get events (FIFO)
+    print("\n📝 Test 3: Get events (FIFO)")
+    for i in range(10):
+        event = await queue.get(timeout=0.5)
+        if event:
+            print(f"   Got event: {event['id']}")
+        else:
+            print(f"   No event (timeout)")
+    
+    print(f"   Queue size: {queue.qsize()}")
+    
+    # Test 4: Statistics
+    print("\n📊 Final Statistics:")
+    stats = queue.get_stats()
+    for key, value in stats.items():
+        print(f"   {key}: {value}")
+    
+    # Cleanup
+    await queue.clear()
+    queue.close()
+    
+    print("\n✅ Testing complete!")
+
+
+if __name__ == "__main__":
+    # Run test
+    asyncio.run(test_hybrid_queue())
