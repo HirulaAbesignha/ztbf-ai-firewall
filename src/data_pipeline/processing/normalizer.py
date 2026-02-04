@@ -177,7 +177,7 @@ class EventNormalizer:
         except Exception as e:
             logger.error(f"Error normalizing Azure AD event: {e}")
             raise NormalizationError(f"Azure AD normalization failed: {str(e)}")
-
+    
     # ===== CLOUDTRAIL NORMALIZATION =====
     
     async def normalize_cloudtrail(self, event: Dict[str, Any]) -> Dict[str, Any]:
@@ -480,7 +480,7 @@ async def test_normalizer():
         print(f"   Error: {e}")
     
     # Test CloudTrail event
-    print("\n📝 Test 2: CloudTrail Event")
+    print("\nTest 2: CloudTrail Event")
     cloudtrail_event = {
         "source_type": "cloudtrail",
         "eventVersion": "1.08",
@@ -513,7 +513,7 @@ async def test_normalizer():
         print(f"   Error: {e}")
     
     # Test API Gateway event
-    print("\n📝 Test 3: API Gateway Log")
+    print("\nTest 3: API Gateway Log")
     api_event = {
         "source_type": "api_gateway",
         "timestamp": "2025-01-08T10:10:00Z",
@@ -540,7 +540,7 @@ async def test_normalizer():
     except Exception as e:
         print(f"   Error: {e}")
     
-    print("\nTesting complete!")
+    print("\n✅ Testing complete!")
 
 
 if __name__ == "__main__":
