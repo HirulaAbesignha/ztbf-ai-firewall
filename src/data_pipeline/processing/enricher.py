@@ -241,4 +241,6 @@ class EventEnricher:
                 "is_admin": False,
                 "is_privileged": False
             }
+
+
     
