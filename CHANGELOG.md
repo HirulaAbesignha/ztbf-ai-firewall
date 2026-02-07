@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Ingestion queue** (src/data_pipline/ingestion/queue.py) - High throughput event buffering with in memory and SQLite backed overflow, automatic backpressure, queue metrics, and graceful degradation under heavy load
 - **Processing Enricher** (src/data_pipeline/processing/enricher.py) - Augments events with GeoIP, entity and device metadata, sensitivity classification, PII anonymization, and modular enrichment logic.
 - **Processing Normalizer** (src/data_pipeline/processing/normalizer.py) - Unifies multi source events into a validated schema with mapping, type conversion, temporal/entity extraction, and robust error logging.
+- **Configs Pipeline** (src/data_pipeline/configs/pipeline_config.yaml) - 
 
 ### Changed
 
