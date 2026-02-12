@@ -243,3 +243,125 @@ class EventProcessor:
                     )
                     self.stats["errors"] += 1
                     return None
+   
+    async def _flush_batch(self):
+        """Flush accumulated batch to storage"""
+        if not self.batch:
+            return
+        
+        try:
+            batch_size = len(self.batch)
+            logger.info(f"💾 Flushing batch of {batch_size} events to storage...")
+            
+            # Write to storage
+            self.storage.write_events(self.batch, tier="hot")
+            
+            self.stats["stored"] += batch_size
+            
+            # Clear batch
+            self.batch = []
+            self.last_flush = datetime.utcnow()
+            
+            logger.info(f"✅ Batch flushed successfully")
+        
+        except Exception as e:
+            logger.error(f"Error flushing batch: {e}", exc_info=True)
+            self.stats["errors"] += 1
+            
+            # On flush error, don't clear batch - will retry on next flush
+    
+    async def _report_stats(self):
+        """Periodically report processing statistics"""
+        while self.running:
+            try:
+                await asyncio.sleep(60)  # Report every minute
+                
+                if self.stats["started_at"]:
+                    uptime = (datetime.utcnow() - self.stats["started_at"]).seconds
+                    rate = self.stats["processed"] / uptime if uptime > 0 else 0
+                    
+                    logger.info("📊 Processing Statistics:")
+                    logger.info(f"   - Processed: {self.stats['processed']:,} ({rate:.1f} events/sec)")
+                    logger.info(f"   - Normalized: {self.stats['normalized']:,}")
+                    logger.info(f"   - Enriched: {self.stats['enriched']:,}")
+                    logger.info(f"   - Stored: {self.stats['stored']:,}")
+                    logger.info(f"   - Errors: {self.stats['errors']}")
+                    logger.info(f"   - Retries: {self.stats['retries']}")
+                    logger.info(f"   - Queue size: {self.event_queue.qsize()}")
+                    logger.info(f"   - Uptime: {uptime}s")
+            
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Stats reporting error: {e}")
+    
+    def _log_final_stats(self):
+        """Log final statistics on shutdown"""
+        if self.stats["started_at"]:
+            uptime = (datetime.utcnow() - self.stats["started_at"]).seconds
+            rate = self.stats["processed"] / uptime if uptime > 0 else 0
+            
+            logger.info("=" * 60)
+            logger.info("📊 FINAL PROCESSING STATISTICS")
+            logger.info("=" * 60)
+            logger.info(f"Total Processed:  {self.stats['processed']:,}")
+            logger.info(f"Total Stored:     {self.stats['stored']:,}")
+            logger.info(f"Total Errors:     {self.stats['errors']}")
+            logger.info(f"Total Retries:    {self.stats['retries']}")
+            logger.info(f"Average Rate:     {rate:.1f} events/sec")
+            logger.info(f"Total Uptime:     {uptime}s")
+            logger.info("=" * 60)
+
+
+# ===== MAIN =====
+
+async def main():
+    """Main entry point"""
+    parser = argparse.ArgumentParser(description="ZTBF Event Processor")
+    parser.add_argument("--workers", type=int, default=8, help="Number of worker threads")
+    parser.add_argument("--batch-size", type=int, default=100, help="Batch size for storage")
+    parser.add_argument("--storage", type=str, default="data/events", help="Storage path")
+    
+    args = parser.parse_args()
+    
+    # Create logs directory
+    Path("logs").mkdir(exist_ok=True)
+    
+    # Initialize queue (shared with ingestion API)
+    queue_config = QueueConfig(
+        max_memory_size=100_000,
+        disk_buffer_path="data/queue_overflow.db",
+        overflow_strategy="disk"
+    )
+    event_queue = HybridQueue(queue_config)
+    
+    # Initialize processor
+    processor_config = ProcessorConfig(
+        num_workers=args.workers,
+        batch_size=args.batch_size,
+        storage_path=args.storage
+    )
+    processor = EventProcessor(event_queue, processor_config)
+    
+    # Setup signal handlers for graceful shutdown
+    def signal_handler(signum, frame):
+        logger.info(f"Received signal {signum}")
+        processor.signal_shutdown()
+    
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    # Start processor
+    try:
+        await processor.start()
+    except KeyboardInterrupt:
+        logger.info("Keyboard interrupt received")
+        processor.signal_shutdown()
+    except Exception as e:
+        logger.error(f"Fatal error: {e}", exc_info=True)
+    finally:
+        event_queue.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
