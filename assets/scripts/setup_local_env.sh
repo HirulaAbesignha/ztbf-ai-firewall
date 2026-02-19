@@ -1,52 +1,45 @@
 #!/bin/bash
 # ZTBF Local Environment Setup Script
-# File: scripts/setup_local_env.sh
-#
-# Sets up the complete local development environment for Phase 1
-#
-# Usage:
-#   chmod +x scripts/setup_local_env.sh
-#   ./scripts/setup_local_env.sh
 
 set -e  # Exit on error
 
-echo "🚀 ZTBF Data Pipeline - Local Environment Setup"
+echo "ZTBF Data Pipeline - Local Environment Setup"
 echo "================================================"
 echo ""
 
 # ===== CHECK PREREQUISITES =====
-echo "📋 Checking prerequisites..."
+echo "Checking prerequisites..."
 
 # Check Python version
 if ! command -v python3 &> /dev/null; then
-    echo "❌ Python 3 is not installed"
+    echo "Python 3 is not installed"
     exit 1
 fi
 
 PYTHON_VERSION=$(python3 --version | cut -d' ' -f2 | cut -d'.' -f1,2)
-echo "✅ Python $PYTHON_VERSION found"
+echo "Python $PYTHON_VERSION found"
 
 # Check Docker
 if ! command -v docker &> /dev/null; then
-    echo "❌ Docker is not installed"
+    echo "Docker is not installed"
     echo "   Install from: https://docs.docker.com/get-docker/"
     exit 1
 fi
-echo "✅ Docker found"
+echo "Docker found"
 
 # Check Docker Compose
 if ! command -v docker-compose &> /dev/null; then
-    echo "⚠️  docker-compose not found, trying 'docker compose'"
+    echo "docker-compose not found, trying 'docker compose'"
     DOCKER_COMPOSE_CMD="docker compose"
 else
     DOCKER_COMPOSE_CMD="docker-compose"
-    echo "✅ Docker Compose found"
+    echo "Docker Compose found"
 fi
 
 echo ""
 
 # ===== CREATE DIRECTORY STRUCTURE =====
-echo "📁 Creating directory structure..."
+echo "Creating directory structure..."
 
 mkdir -p data/events
 mkdir -p data/queue
@@ -54,58 +47,58 @@ mkdir -p logs
 mkdir -p configs
 mkdir -p deployment/docker
 
-echo "✅ Directories created"
+echo "Directories created"
 echo ""
 
 # ===== SETUP PYTHON ENVIRONMENT =====
-echo "🐍 Setting up Python virtual environment..."
+echo "Setting up Python virtual environment..."
 
 if [ ! -d "venv" ]; then
     python3 -m venv venv
-    echo "✅ Virtual environment created"
+    echo "Virtual environment created"
 else
-    echo "✅ Virtual environment already exists"
+    echo "Virtual environment already exists"
 fi
 
 # Activate virtual environment
 source venv/bin/activate
 
-echo "📦 Installing Python dependencies..."
+echo "Installing Python dependencies..."
 pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 
-echo "✅ Python dependencies installed"
+echo "Python dependencies installed"
 echo ""
 
 # ===== START DOCKER SERVICES =====
-echo "🐳 Starting Docker services..."
+echo "Starting Docker services..."
 
 cd deployment/docker
 
 # Start MinIO
 $DOCKER_COMPOSE_CMD up -d minio minio-init
 
-echo "⏳ Waiting for MinIO to be ready..."
+echo "Waiting for MinIO to be ready..."
 sleep 10
 
 # Check MinIO health
 if curl -f http://localhost:9000/minio/health/live > /dev/null 2>&1; then
-    echo "✅ MinIO is running"
+    echo "MinIO is running"
     echo "   - API: http://localhost:9000"
     echo "   - Console: http://localhost:9001"
     echo "   - Username: minioadmin"
     echo "   - Password: minioadmin"
 else
-    echo "❌ MinIO failed to start"
+    echo "MinIO failed to start"
     exit 1
 fi
 
 # Start Redis (optional)
-read -p "🔴 Do you want to start Redis? (y/n) " -n 1 -r
+read -p "Do you want to start Redis? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     $DOCKER_COMPOSE_CMD up -d redis
-    echo "✅ Redis is running on port 6379"
+    echo "Redis is running on port 6379"
 fi
 
 cd ../..
@@ -113,18 +106,18 @@ cd ../..
 echo ""
 
 # ===== GENERATE SAMPLE DATA =====
-echo "📊 Generating sample data..."
+echo "Generating sample data..."
 
 python3 src/data_pipeline/generators/synthetic_logs.py \
     --count 1000 \
     --output data/synthetic_events_normal.json \
     --scenario normal
 
-echo "✅ Generated 1,000 sample events"
+echo "Generated 1,000 sample events"
 echo ""
 
 # ===== CREATE SYSTEMD SERVICES (Optional) =====
-read -p "🔧 Do you want to create systemd services for auto-start? (y/n) " -n 1 -r
+read -p "Do you want to create systemd services for auto-start? (y/n) " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "Creating systemd service files..."
@@ -174,24 +167,24 @@ fi
 echo ""
 
 # ===== VERIFY INSTALLATION =====
-echo "🧪 Verifying installation..."
+echo "Verifying installation..."
 
 # Check if all required Python packages are installed
-python3 -c "import fastapi, pydantic, pandas, pyarrow" && echo "✅ Core Python packages OK"
+python3 -c "import fastapi, pydantic, pandas, pyarrow" && echo "Core Python packages OK"
 
 # Check if data directories exist
-[ -d "data/events" ] && echo "✅ Data directories OK"
+[ -d "data/events" ] && echo "Data directories OK"
 
 # Check if logs directory exists
-[ -d "logs" ] && echo "✅ Logs directory OK"
+[ -d "logs" ] && echo "Logs directory OK"
 
 echo ""
 
 # ===== COMPLETION =====
-echo "✅ Setup Complete!"
+echo "Setup Complete!"
 echo ""
 echo "================================================"
-echo "🎯 NEXT STEPS"
+echo "NEXT STEPS"
 echo "================================================"
 echo ""
 echo "1. Start the Ingestion API:"
@@ -212,7 +205,7 @@ echo "5. Generate and ingest test data:"
 echo "   python scripts/ingest_synthetic_data.py --rate 100"
 echo ""
 echo "================================================"
-echo "📚 DOCUMENTATION"
+echo "DOCUMENTATION"
 echo "================================================"
 echo ""
 echo "- Phase 1 Guide: docs/phase1_implementation_guide.md"
