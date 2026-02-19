@@ -9,12 +9,10 @@
 
 **Enterprise-grade behavioral security that detects threats traditional firewalls miss**
 
-[Quick Start](#quick-start) • [Documentation](#documentation) • [Contributing](#contributing) • [Roadmap](#roadmap)
+[Quick Start](#-quick-start) • [Documentation](#-documentation) • [Contributing](#-contributing) • [Roadmap](#-roadmap)
 
 </div>
 
----
-![ztbf](assets/ztbf.jpg)
 ---
 
 ## What is ZTBF?
@@ -65,7 +63,7 @@ ZTBF is cloud-native, scalable, and privacy-aware, with explainable security dec
 ```bash
 # 1. Clone repository
 git clone https://github.com/HirulaAbesignha/ztbf-ai-firewall.git
-cd ztbf-ai-firewall
+cd ztbf
 
 # 2. Run automated setup
 chmod +x scripts/setup_local_env.sh
@@ -189,7 +187,7 @@ We welcome contributions from security researchers, ML engineers, developers, an
 
 ## Repository Structure
 ```
-ztbf-ai-firewall/
+ai-zero-trust-behavior-firewall/
 ├── research/                    # Threat models, research papers
 │   └── threat_model.md
 ├── architecture/                # System architecture docs
