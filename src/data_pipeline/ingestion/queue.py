@@ -320,7 +320,7 @@ class HybridQueue:
             if event:
                 self.stats["dequeued"] += 1
                 self.stats["disk_reads"] += 1
-                logger.debug("📦 Event retrieved from disk buffer")
+                logger.debug(" Event retrieved from disk buffer")
             
             return event
         
