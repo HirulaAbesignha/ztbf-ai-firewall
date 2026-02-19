@@ -222,7 +222,7 @@ class HybridQueue:
         # Lock for thread safety
         self.lock = asyncio.Lock()
         
-        logger.info("🔄 Hybrid queue initialized")
+        logger.info("Hybrid queue initialized")
         logger.info(f"   - Memory capacity: {config.max_memory_size:,} events")
         logger.info(f"   - Overflow strategy: {config.overflow_strategy}")
     
@@ -269,17 +269,17 @@ class HybridQueue:
             if success:
                 self.stats["overflowed"] += 1
                 self.stats["disk_writes"] += 1
-                logger.debug("📦 Event overflowed to disk")
+                logger.debug(" Event overflowed to disk")
                 return True
             else:
                 self.stats["dropped"] += 1
-                logger.warning("⚠️  Failed to overflow event to disk")
+                logger.warning("  Failed to overflow event to disk")
                 return False
         
         elif self.config.overflow_strategy == "drop":
             # Drop event
             self.stats["dropped"] += 1
-            logger.warning("⚠️  Event dropped (queue full)")
+            logger.warning("  Event dropped (queue full)")
             return False
         
         else:
@@ -359,7 +359,7 @@ class HybridQueue:
                             break
                 
                 if refill_count > 0:
-                    logger.info(f"📤 Refilled {refill_count} events from disk to memory")
+                    logger.info(f" Refilled {refill_count} events from disk to memory")
     
     def qsize(self) -> int:
         """
@@ -402,7 +402,7 @@ class HybridQueue:
             "disk_writes": 0,
             "errors": 0
         }
-        logger.info("📊 Queue statistics reset")
+        logger.info(" Queue statistics reset")
     
     async def clear(self):
         """Clear all events from queue"""
@@ -417,18 +417,18 @@ class HybridQueue:
             # Clear disk buffer
             self.disk_buffer.clear()
             
-            logger.info("🗑️  Queue cleared")
+            logger.info("Queue cleared")
     
     def close(self):
         """Close queue and cleanup resources"""
         self.disk_buffer.close()
-        logger.info("🔄 Hybrid queue closed")
+        logger.info(" Hybrid queue closed")
 
 # ===== TESTING UTILITIES =====
 
 async def test_hybrid_queue():
     """Test hybrid queue functionality"""
-    print("🧪 Testing Hybrid Queue...")
+    print(" Testing Hybrid Queue...")
     
     # Initialize queue
     config = QueueConfig(
@@ -439,27 +439,27 @@ async def test_hybrid_queue():
     queue = HybridQueue(config)
     
     # Test 1: Put events in memory
-    print("\n📝 Test 1: Put events in memory")
+    print(" Test 1: Put events in memory")
     for i in range(5):
         event = {"id": i, "data": f"event_{i}"}
         success = await queue.put(event)
-        print(f"   Put event {i}: {'✅' if success else '❌'}")
+        print(f"   Put event {i}: {'' if success else '❌'}")
     
     print(f"   Queue size: {queue.qsize()}")
     
     # Test 2: Fill memory and overflow to disk
-    print("\n📝 Test 2: Overflow to disk")
+    print(" Test 2: Overflow to disk")
     for i in range(5, 20):
         event = {"id": i, "data": f"event_{i}"}
         success = await queue.put(event)
-        print(f"   Put event {i}: {'✅' if success else '❌'}")
+        print(f"   Put event {i}: {'' if success else '❌'}")
     
     print(f"   Queue size: {queue.qsize()}")
     stats = queue.get_stats()
     print(f"   Overflowed: {stats['overflowed']}")
     
     # Test 3: Get events (FIFO)
-    print("\n📝 Test 3: Get events (FIFO)")
+    print(" Test 3: Get events (FIFO)")
     for i in range(10):
         event = await queue.get(timeout=0.5)
         if event:
@@ -470,7 +470,7 @@ async def test_hybrid_queue():
     print(f"   Queue size: {queue.qsize()}")
     
     # Test 4: Statistics
-    print("\n📊 Final Statistics:")
+    print(" Final Statistics:")
     stats = queue.get_stats()
     for key, value in stats.items():
         print(f"   {key}: {value}")
@@ -479,7 +479,7 @@ async def test_hybrid_queue():
     await queue.clear()
     queue.close()
     
-    print("\n✅ Testing complete!")
+    print("\n Testing complete!")
 
 
 if __name__ == "__main__":
