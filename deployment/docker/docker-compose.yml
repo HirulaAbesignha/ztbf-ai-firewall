@@ -1,0 +1,118 @@
+# ZTBF Data Pipeline - Docker Compose
+
+version: '3.8'
+
+services:
+  # ===== MinIO (S3-Compatible Object Storage) =====
+  minio:
+    image: minio/minio:latest
+    container_name: ztbf-minio
+    ports:
+      - "9000:9000"      # API endpoint
+      - "9001:9001"      # Web console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_REGION: us-east-1
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - ztbf-network
+    restart: unless-stopped
+  
+  # Create MinIO bucket on startup
+  minio-init:
+    image: minio/mc:latest
+    container_name: ztbf-minio-init
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/ztbf-events --ignore-existing;
+      /usr/bin/mc anonymous set public myminio/ztbf-events;
+      exit 0;
+      "
+    networks:
+      - ztbf-network
+
+  # ===== Redis (Caching - Optional) =====
+  redis:
+    image: redis:7-alpine
+    container_name: ztbf-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - ztbf-network
+    restart: unless-stopped
+
+  # ===== Prometheus (Metrics - Optional) =====
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ztbf-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - ztbf-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # ===== Grafana (Visualization - Optional) =====
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ztbf-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - ztbf-network
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+# ===== VOLUMES =====
+volumes:
+  minio_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+# ===== NETWORKS =====
+networks:
+  ztbf-network:
+    driver: bridge
