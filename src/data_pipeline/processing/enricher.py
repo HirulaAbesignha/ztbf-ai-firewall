@@ -32,7 +32,40 @@ class EventEnricher:
     - Device fingerprint parsing
     - Resource sensitivity classification
     """
-    
+    def _load_sensitivity_rules(self) -> Dict[str, int]:
+
+        return {
+            # Critical resources (Level 5)
+            "iam": 5,
+            "admin": 5,
+            "password": 5,
+            "credential": 5,
+            "secret": 5,
+            
+            # High sensitivity (Level 4)
+            "customer": 4,
+            "payment": 4,
+            "financial": 4,
+            "health": 4,
+            "medical": 4,
+            
+            # Medium sensitivity (Level 3)
+            "user": 3,
+            "account": 3,
+            "profile": 3,
+            "database": 3,
+            
+            # Low sensitivity (Level 2)
+            "log": 2,
+            "metric": 2,
+            "report": 2,
+            
+            # Public resources (Level 1)
+            "public": 1,
+            "health": 1,
+            "status": 1
+        }
+
     def __init__(self, config: Optional[EnricherConfig] = None):
         """
         Initialize enricher
