@@ -8,7 +8,7 @@ import sys
 import time
 import json
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import List, Dict
 
@@ -101,7 +101,7 @@ class PipelineTestSuite:
         try:
             # Generate event
             user = self.generator.users[0]
-            event = self.generator.generate_azure_ad_signin(user, datetime.now(datetime.UTC))
+            event = self.generator.generate_azure_ad_signin(user, datetime.utcnow())
             
             # Send to API
             async with aiohttp.ClientSession() as session:
@@ -174,7 +174,7 @@ class PipelineTestSuite:
         
         try:
             user = self.generator.users[0]
-            timestamp = datetime.now(datetime.UTC)
+            timestamp = datetime.utcnow()
             
             event_types = [
                 ("azure_ad", self.generator.generate_azure_ad_signin(user, timestamp)),
@@ -222,7 +222,7 @@ class PipelineTestSuite:
             async with aiohttp.ClientSession() as session:
                 for i in range(1000):
                     user = self.generator.users[i % len(self.generator.users)]
-                    event = self.generator.generate_api_gateway_event(user, datetime.now(datetime.UTC))
+                    event = self.generator.generate_api_gateway_event(user, datetime.utcnow())
                     
                     # Send async (fire and forget)
                     asyncio.create_task(self._send_event(session, event))
@@ -273,7 +273,7 @@ class PipelineTestSuite:
         
         try:
             # Check if storage has data
-            end_time = datetime.now(datetime.UTC)
+            end_time = datetime.utcnow()
             start_time = end_time - timedelta(hours=1)
             
             events_df = self.storage.read_events(
@@ -308,7 +308,7 @@ class PipelineTestSuite:
         
         try:
             # Read recent events
-            end_time = datetime.now(datetime.UTC)
+            end_time = datetime.utcnow()
             start_time = end_time - timedelta(hours=1)
             
             events_df = self.storage.read_events(
