@@ -1,0 +1,339 @@
+# GitHub Actions CI/CD Workflow for ZTBF
+
+name: ZTBF CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  PYTHON_VERSION: '3.10'
+  
+jobs:
+  # ===== CODE QUALITY CHECKS =====
+  lint:
+    name: Code Quality (Linting & Formatting)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install black flake8 isort mypy
+        pip install -r requirements.txt
+    
+    - name: Check code formatting (Black)
+      run: black --check src/ tests/
+    
+    - name: Check import sorting (isort)
+      run: isort --check-only src/ tests/
+    
+    - name: Lint with flake8
+      run: |
+        # Stop build if there are Python syntax errors or undefined names
+        flake8 src/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 src/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+    
+    - name: Type check with mypy
+      run: mypy src/ --ignore-missing-imports
+      continue-on-error: true  # Don't fail build on type errors yet
+
+  # ===== SECURITY SCANNING =====
+  security:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Run Bandit security scan
+      uses: tj-actions/bandit@v5.1
+      with:
+        targets: src/
+        options: "-r -ll"
+    
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+
+  # ===== UNIT TESTS =====
+  test-unit:
+    name: Unit Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11']
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install pytest pytest-cov pytest-asyncio
+        pip install -r requirements.txt
+    
+    - name: Run unit tests
+      run: |
+        pytest tests/unit/ -v --cov=src --cov-report=xml --cov-report=term
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-unit-${{ matrix.python-version }}
+
+  # ===== INTEGRATION TESTS =====
+  test-integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      minio:
+        image: minio/minio:latest
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        ports:
+          - 9000:9000
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install pytest pytest-asyncio pytest-timeout
+        pip install -r requirements.txt
+    
+    - name: Wait for services
+      run: |
+        sleep 10
+        curl http://localhost:9000/minio/health/live
+    
+    - name: Run integration tests
+      run: |
+        pytest tests/integration/ -v --timeout=60
+      env:
+        MINIO_ENDPOINT: http://localhost:9000
+        REDIS_HOST: localhost
+        REDIS_PORT: 6379
+
+  # ===== BUILD DOCKER IMAGE =====
+  build-docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [lint, test-unit]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Build Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./deployment/docker/Dockerfile.pipeline
+        push: false
+        tags: ztbf:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  # ===== PERFORMANCE TESTS =====
+  test-performance:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration]
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Start services
+      run: |
+        docker-compose -f deployment/docker/docker-compose.yml up -d
+        sleep 10
+    
+    - name: Run performance benchmark
+      run: |
+        python scripts/benchmark.py --duration 30 --rate 1000
+    
+    - name: Comment benchmark results
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const results = fs.readFileSync('benchmark_results.json', 'utf8');
+          const data = JSON.parse(results);
+          
+          const comment = `## ⚡ Performance Benchmark Results
+          
+          - **Throughput**: ${data.throughput} events/sec
+          - **Latency (p50)**: ${data.latency_p50}ms
+          - **Latency (p95)**: ${data.latency_p95}ms
+          - **Latency (p99)**: ${data.latency_p99}ms
+          - **Error Rate**: ${data.error_rate}%
+          
+          ${data.throughput >= 1000 ? '✅ Performance target met!' : '⚠️ Performance below target'}
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  # ===== DOCUMENTATION =====
+  docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        pip install sphinx sphinx-rtd-theme
+        pip install -r requirements.txt
+    
+    - name: Build documentation
+      run: |
+        cd docs
+        make html
+      continue-on-error: true
+    
+    - name: Upload docs artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: docs/_build/html/
+
+  # ===== DEPENDENCY CHECK =====
+  dependency-check:
+    name: Dependency Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install safety
+      run: pip install safety
+    
+    - name: Check dependencies for vulnerabilities
+      run: |
+        pip install -r requirements.txt
+        safety check --json
+      continue-on-error: true
+
+  # ===== PUBLISH RESULTS =====
+  publish-results:
+    name: Publish Test Results
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration]
+    if: always()
+    
+    steps:
+    - name: Download test results
+      uses: actions/download-artifact@v3
+    
+    - name: Publish test results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        files: |
+          **/test-results/**/*.xml
+          **/pytest.xml
+
+  # ===== NOTIFY =====
+  notify:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [lint, security, test-unit, test-integration]
+    if: failure() && github.event_name == 'push'
+    
+    steps:
+    - name: Send failure notification
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        text: 'CI Pipeline Failed for ZTBF'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+      if: always()
